@@ -36,7 +36,7 @@ void renderScene(GLFWwindow* window) {
     glfwSwapBuffers(window);
 }
 
-int main() {
+int OpenWindow() {
     // Initialize GLFW
     if (!glfwInit()) {
         return -1;
@@ -65,5 +65,3 @@ int main() {
     glfwTerminate();
     return 0;
 }
-
-
