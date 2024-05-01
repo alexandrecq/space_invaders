@@ -1,18 +1,19 @@
 #include "space_invaders/game.h"
+#include "Eigen/src/Core/Matrix.h"
 
 Game::Game() {
     m_start_time = std::chrono::steady_clock::now();
     m_tick_ms = 1;
 
-    // Player player(&m_interface);
     m_entities[0] = std::make_shared<Player>(&m_interface);
-    // m_entities[1] = std::make_shared<Player>(&m_interface);
+    Vector2f pos = {-1, 1};
+    m_entities[1] = std::make_shared<Alien>(&m_interface, pos);
 
 }
 
 void Game::run() {
     while (m_interface.isAlive()) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(m_tick_ms));
+        std::this_thread::sleep_for(std::chrono::milliseconds((long long)m_tick_ms));
         auto elapsed = std::chrono::steady_clock::now() - m_start_time;
         auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed);
         printf("Elapsed: %.2ld\n", elapsed_ms.count());

@@ -14,7 +14,7 @@ public:
 	void run();
 private:
 	Interface m_interface;
-	static constexpr int m_num_entities = 1;
+	static constexpr int m_num_entities = 2;
 	std::shared_ptr<Entity> m_entities[m_num_entities];
 
 	std::chrono::time_point<std::chrono::steady_clock> m_start_time;
