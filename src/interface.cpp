@@ -14,8 +14,6 @@ Interface::Interface() {
     const char* glsl_version = "#version 130";
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-    //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
-    //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 
     // Create window with graphics context
     m_window = glfwCreateWindow(1280, 720, "Space Invaders", nullptr, nullptr);
@@ -54,7 +52,7 @@ bool Interface::isAlive() const {
     return !glfwWindowShouldClose(m_window);
 }
 
-void Interface::update(){
+void Interface::startFrame(){
     glfwPollEvents();
 
     // Start the Dear ImGui frame
@@ -72,10 +70,10 @@ void Interface::update(){
     glViewport(0, 0, display_w, display_h);
     glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT);
+}
 
-    renderScene();
+void Interface::renderFrame(){
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
     glfwSwapBuffers(m_window);
 }
 
@@ -92,7 +90,7 @@ void drawSquare() {
     glEnd();
 }
 
-void Interface::drawRectangle(Eigen::Vector2f topLeft, Eigen::Vector2f widthHeight, Eigen::Vector3f color) {
+void Interface::drawRectangle(Eigen::Vector2f topLeft, Eigen::Vector2f widthHeight, Eigen::Vector3f color = {1., 1., 1.}) {
     glBegin(GL_QUADS);
     glColor3f(color.x(), color.y(), color.z());
     glVertex2f(topLeft.x(), topLeft.y());
@@ -102,12 +100,12 @@ void Interface::drawRectangle(Eigen::Vector2f topLeft, Eigen::Vector2f widthHeig
     glEnd();
 }
 
-void Interface::renderScene() {
+void Interface::renderScene(float pos) {
     glClear(GL_COLOR_BUFFER_BIT);
 
     // drawSquare();
     // drawTriangle();
-    drawRectangle({0, 0}, {.1, .1}, {1, 1, 1});
+    drawRectangle({pos, 0}, {.1, .1}, {1, 1, 1});
 
     glfwSwapBuffers(m_window);
 }

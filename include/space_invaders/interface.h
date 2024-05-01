@@ -11,16 +11,17 @@ static void glfw_error_callback(int error, const char* description)
     fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }
 
-// void renderScene(GLFWwindow* window);
-
 class Interface {
 public:
 	Interface();
 	~Interface();
 	void update();
+	void startFrame();
+	void renderFrame();
 	bool isAlive() const;
-	void renderScene();
-private:
+	void renderScene(float pos);
 	void drawRectangle(Eigen::Vector2f topLeft, Eigen::Vector2f widthHeight, Eigen::Vector3f color);
+private:
+	// Eigen::Vector2i getWindowSize
 	GLFWwindow* m_window;
 };

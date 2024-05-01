@@ -1,14 +1,35 @@
 #include "space_invaders/game.h"
 
 Game::Game() {
-    // m_interface = Interface();
-    Interface interface;
-    m_interface = interface;
+    m_start_time = std::chrono::steady_clock::now();
+    m_tick_ms = 1;
+
+    // Player player(&m_interface);
+    m_entities[0] = std::make_shared<Player>(&m_interface);
+    // m_entities[1] = std::make_shared<Player>(&m_interface);
+
 }
 
 void Game::run() {
-    // Interface interface;
     while (m_interface.isAlive()) {
-        m_interface.update();
+        std::this_thread::sleep_for(std::chrono::milliseconds(m_tick_ms));
+        auto elapsed = std::chrono::steady_clock::now() - m_start_time;
+        auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed);
+        printf("Elapsed: %.2ld\n", elapsed_ms.count());
+
+
+        m_interface.startFrame();
+
+        // m_interface.drawRectangle({pos, 0}, {.1, .1}, {1, 1, 1});
+        // long int update_interval = 1000;
+        // float pos = ((float)elapsed_ms.count() / 5000) - 1;
+
+        for (auto entity : m_entities) {
+            if (entity) {
+                entity->update(elapsed_ms.count());
+                entity->draw();
+            }
+        }
+        m_interface.renderFrame();
     }
 }

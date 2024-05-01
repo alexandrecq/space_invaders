@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.0)
 project(SpaceInvaders)
 
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 # Find and include ImGui
 set(IMGUI_DIR "dependencies/imgui")
 file(GLOB IMGUI_SOURCES
