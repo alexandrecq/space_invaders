@@ -21,5 +21,5 @@ private:
 	std::vector<std::shared_ptr<Entity>> m_entities;
 
 	std::chrono::time_point<std::chrono::steady_clock> m_start_time;
-	long long m_tick_ms = 100;
+	const long long m_tick_ms = 100;
 };

@@ -52,7 +52,7 @@ bool Interface::isAlive() const {
     return !glfwWindowShouldClose(m_window);
 }
 
-void Interface::startFrame(){
+void Interface::startFrame() const {
     glfwPollEvents();
 
     // Start the Dear ImGui frame
@@ -72,25 +72,14 @@ void Interface::startFrame(){
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void Interface::renderFrame(){
+void Interface::renderFrame() const {
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     glfwSwapBuffers(m_window);
 }
 
-void drawSquare() {
-    glBegin(GL_QUADS);
-    glColor3f(1.0f, 1.0f, 1.0f);   // White
-    glVertex2f(-1.f, -1.f);
-    // glColor3f(0.0f, 1.0f, 1.0f);   // Cyan
-    glVertex2f(-0.5f, 0.5f);
-    // glColor3f(1.0f, 0.0f, 1.0f);   // Magenta
-    glVertex2f(0.5f, 0.5f);
-    // glColor3f(1.0f, 0.5f, 0.0f);   // Orange
-    glVertex2f(0.5f, -0.5f);
-    glEnd();
-}
-
-void Interface::drawRectangle(Eigen::Vector2f topLeft, Eigen::Vector2f widthHeight, Eigen::Vector3f color) {
+void Interface::drawRectangle(
+    Eigen::Vector2f topLeft, Eigen::Vector2f widthHeight, Eigen::Vector3f color
+    ) const {
     glBegin(GL_QUADS);
     glColor3f(color.x(), color.y(), color.z());
     glVertex2f(topLeft.x(), topLeft.y());
@@ -98,14 +87,4 @@ void Interface::drawRectangle(Eigen::Vector2f topLeft, Eigen::Vector2f widthHeig
     glVertex2f(topLeft.x() + widthHeight.x(), topLeft.y() - widthHeight.y());
     glVertex2f(topLeft.x() + widthHeight.x(), topLeft.y());
     glEnd();
-}
-
-void Interface::renderScene(float pos) {
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    // drawSquare();
-    // drawTriangle();
-    drawRectangle({pos, 0}, {.1, .1}, {1, 1, 1});
-
-    glfwSwapBuffers(m_window);
 }

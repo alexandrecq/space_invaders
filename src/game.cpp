@@ -7,7 +7,6 @@ Game::Game() {
 
     // m_entities[0] = std::make_shared<Player>(&m_interface);
     m_entities.push_back(std::make_shared<Player>(&m_interface));
-    // m_entities.push_back(std::make_shared<Alien>(&m_interface));
     initAlienGrid();
 }
 
