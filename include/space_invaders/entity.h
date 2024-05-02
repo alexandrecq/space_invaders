@@ -38,13 +38,20 @@ private:
 
 class Alien : public Entity {
 public:
-	Alien(Interface* interface, Vector2f position);
+	Alien(Interface* interface);
+	Alien(Interface* interface, Vector2f position, Vector2f width_height,
+		Vector2f step_size, int num_steps_til_reverse);
 	void update(int ticks) override;
 	void draw() override;
 private:
-	Vector3f m_color = {1, .5, .5};
-	Vector2f m_width_height = {.1, .1};
+	Vector3f m_color = {.5, 0, .5};
 	int m_step_every_ticks = 1000;
-	int m_last_step = 0;
-	Vector2f m_step_size = {m_width_height.x() * 1.5, 0};
+	int m_last_step_tick = 0;
+	int m_steps_taken = 0;
+	int m_num_steps_til_reverse = 3;
+
+	Vector2f m_step_size = {.1, -.1};
+	Vector2f m_width_height = {.1, .1};
+	// Vector2f m_width_height = {.1, .1};
+	// Vector2f m_step_size = {m_width_height.x() * 1.5, 0};
 };

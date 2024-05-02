@@ -16,7 +16,7 @@ Interface::Interface() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
     // Create window with graphics context
-    m_window = glfwCreateWindow(1280, 720, "Space Invaders", nullptr, nullptr);
+    m_window = glfwCreateWindow(1000, 1000, "Space Invaders", nullptr, nullptr);
     if (m_window == nullptr)
         return;
     glfwMakeContextCurrent(m_window);
@@ -90,7 +90,7 @@ void drawSquare() {
     glEnd();
 }
 
-void Interface::drawRectangle(Eigen::Vector2f topLeft, Eigen::Vector2f widthHeight, Eigen::Vector3f color = {1., 1., 1.}) {
+void Interface::drawRectangle(Eigen::Vector2f topLeft, Eigen::Vector2f widthHeight, Eigen::Vector3f color) {
     glBegin(GL_QUADS);
     glColor3f(color.x(), color.y(), color.z());
     glVertex2f(topLeft.x(), topLeft.y());

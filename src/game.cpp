@@ -1,30 +1,49 @@
 #include "space_invaders/game.h"
 #include "Eigen/src/Core/Matrix.h"
+#include <cstdlib>
 
 Game::Game() {
     m_start_time = std::chrono::steady_clock::now();
-    m_tick_ms = 1;
 
-    m_entities[0] = std::make_shared<Player>(&m_interface);
-    Vector2f pos = {-1, 1};
-    m_entities[1] = std::make_shared<Alien>(&m_interface, pos);
+    // m_entities[0] = std::make_shared<Player>(&m_interface);
+    m_entities.push_back(std::make_shared<Player>(&m_interface));
+    // m_entities.push_back(std::make_shared<Alien>(&m_interface));
+    initAlienGrid();
+}
 
+void Game::initAlienGrid(int num_rows, int num_cols) {
+    const float width = .1, height = .1;
+    const Vector2f delta_xy = {width * 1.5, height * 1.5};
+    const Vector2f step_size = {width / 2, -height / 2};
+
+    float grid_outer_width = (num_cols * width) + (num_cols - 1) * (delta_xy.x() - width);
+    float extra_space = 2 - grid_outer_width;
+    int num_steps_til_reverse = extra_space / step_size.x();
+
+    for (int i = 0; i < num_rows; i++) {
+        for (int j = 0; j < num_cols; j++) {
+            Vector2f position = {-1 + delta_xy.x() * j, 1 - delta_xy.y() * i};
+            // printf("i: %d, j: %d, position: (%.2f, %.2f)\n", i, j, position.x(), position.y());
+            auto alien = std::make_shared<Alien>(
+                &m_interface,
+                position,
+                Vector2f{width, height},
+                step_size,
+                num_steps_til_reverse
+            );
+            m_entities.push_back(alien);
+        }
+    }
 }
 
 void Game::run() {
     while (m_interface.isAlive()) {
-        std::this_thread::sleep_for(std::chrono::milliseconds((long long)m_tick_ms));
+        std::this_thread::sleep_for(std::chrono::milliseconds(m_tick_ms));
         auto elapsed = std::chrono::steady_clock::now() - m_start_time;
         auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed);
         printf("Elapsed: %.2ld\n", elapsed_ms.count());
 
-
         m_interface.startFrame();
-
-        // m_interface.drawRectangle({pos, 0}, {.1, .1}, {1, 1, 1});
-        // long int update_interval = 1000;
-        // float pos = ((float)elapsed_ms.count() / 5000) - 1;
-
         for (auto entity : m_entities) {
             if (entity) {
                 entity->update(elapsed_ms.count());
