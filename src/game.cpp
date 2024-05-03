@@ -1,13 +1,20 @@
 #include "space_invaders/game.h"
-#include "Eigen/src/Core/Matrix.h"
+#include "space_invaders/entity.h"
 #include <cstdlib>
 
 Game::Game() {
+    // m_interface = std::make_shared<Interface>();
     m_start_time = std::chrono::steady_clock::now();
 
     // m_entities[0] = std::make_shared<Player>(&m_interface);
-    m_entities.push_back(std::make_shared<Player>(&m_interface));
+    auto player = std::make_shared<Player>(&m_interface);
+    m_entities.push_back(player);
+    m_interface.setPlayer(player);
+
     initAlienGrid();
+
+    const Vector2f barrier_position{-.25, -.5};
+    m_entities.push_back(std::make_shared<Barrier>(&m_interface, barrier_position));
 }
 
 void Game::initAlienGrid(int num_rows, int num_cols) {

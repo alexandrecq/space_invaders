@@ -49,7 +49,7 @@ Interface::~Interface() {
 }
 
 bool Interface::isAlive() const {
-    return !glfwWindowShouldClose(m_window);
+    return !(glfwWindowShouldClose(m_window) || ImGui::IsKeyPressed(ImGuiKey_Q));
 }
 
 void Interface::startFrame() const {
@@ -61,7 +61,7 @@ void Interface::startFrame() const {
     ImGui::NewFrame();
 
     // Our state
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    ImVec4 clear_color = ImVec4(0.15f, 0.05f, 0.20f, 1.00f);
 
     // Rendering
     ImGui::Render();
@@ -70,6 +70,8 @@ void Interface::startFrame() const {
     glViewport(0, 0, display_w, display_h);
     glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    keyboardEvent();
 }
 
 void Interface::renderFrame() const {
@@ -87,4 +89,21 @@ void Interface::drawRectangle(
     glVertex2f(topLeft.x() + widthHeight.x(), topLeft.y() - widthHeight.y());
     glVertex2f(topLeft.x() + widthHeight.x(), topLeft.y());
     glEnd();
+}
+
+bool Interface::keyboardEvent() const {
+    if (ImGui::GetIO().WantCaptureKeyboard) {
+            return false;
+    }
+    if (ImGui::IsKeyPressed(ImGuiKey_S)) {
+        m_player->takeStep(false);
+    }
+    if (ImGui::IsKeyPressed(ImGuiKey_F)) {
+        m_player->takeStep(true);
+    }
+    return false;
+}
+
+void Interface::setPlayer(std::shared_ptr<Player> player) {
+    m_player = player;
 }

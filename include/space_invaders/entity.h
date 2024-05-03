@@ -8,6 +8,8 @@
 using Eigen::Vector2f;
 using Eigen::Vector3f;
 
+class Interface;
+
 class Entity {
 public:
 	Entity(Interface* m_interface);
@@ -30,6 +32,7 @@ public:
 	Player();
 	void update(int ticks) override;
 	void draw() const override;
+	void takeStep(bool toTheRight);
 private:
 	Vector3f m_color = {0, 0, 1};
 	const Vector2f m_width_height = {.1, .1};
@@ -53,4 +56,14 @@ private:
 
 	Vector2f m_step_size = {.1, -.1};
 	const Vector2f m_width_height = {.1, .1};
+};
+
+class Barrier : public Entity {
+public:
+	Barrier(Interface* interface, Vector2f position);
+	void update(int ticks) override;
+	void draw() const override;
+private:
+	Vector3f m_color = {.5, .4, .1};
+	const Vector2f m_width_height = {.5, .2};
 };

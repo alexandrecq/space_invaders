@@ -14,6 +14,10 @@ void Player::draw() const {
     m_interface->drawRectangle(m_position, m_width_height, m_color);
 }
 
+void Player::takeStep(bool toTheRight) {
+    m_position.x() += toTheRight ? +.1 : -.1;
+}
+
 
 Alien::Alien(Interface* interface) : Entity(interface)  {
     m_position = {-1, 1};
@@ -43,3 +47,10 @@ void Alien::update(int ticks)  {
 void Alien::draw() const {
     m_interface->drawRectangle(m_position, m_width_height, m_color);
 }
+
+Barrier::Barrier(Interface* interface, Vector2f position) : Entity(interface, position) {}
+void Barrier::update(int ticks)  {}
+void Barrier::draw() const {
+    m_interface->drawRectangle(m_position, m_width_height, m_color);
+}
+

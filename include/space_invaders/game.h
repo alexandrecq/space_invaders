@@ -16,6 +16,8 @@ public:
 	void initAlienGrid(int num_rows = 5, int num_cols = 10);
 private:
 	Interface m_interface;
+	// std::shared_ptr<Interface> m_interface;
+	
 	// static constexpr int m_max_entities = 10;
 	// std::shared_ptr<Entity> m_entities[m_num_entities];
 	std::vector<std::shared_ptr<Entity>> m_entities;
