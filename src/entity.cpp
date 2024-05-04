@@ -1,5 +1,6 @@
 #include "space_invaders/entity.h"
 #include "space_invaders/interface.h"
+#include <memory>
 
 
 Entity::Entity(Array2f widthHeight, Array2f position, Array3f color) :
@@ -12,10 +13,48 @@ void Entity::draw(Interface* interface) const {
     interface->drawRectangle(bottomLeft, m_widthHeight, m_color);
 }
 
-Player::Player(Array2f widthHeight, Array2f position, Array3f color) :
+Array2f Entity::getPosition() const {
+    return m_position;
+}
+
+void Entity::setPosition(Array2f position) {
+    m_position = position;
+}
+
+float Entity::getHeight() {
+    return m_widthHeight.y();
+}
+
+
+Projectile::Projectile(Array2f widthHeight, Array2f position, Array3f color) :
     Entity(widthHeight, position, color) {}
 
-void Player::update(int ticks)  {}
+void Projectile::update(int ticks)  {}
+
+CanFire::CanFire(bool firesUp) : m_firesUp(firesUp){
+    //set default values for projectile
+    Array2f widthHeight{.01, .1};
+    Array2f position{0, 0};
+    Array3f color{1., 1., 1.};
+    m_projectile = std::make_unique<Projectile>(widthHeight, position, color);
+    // printf("CanFire constructor: %p, %d\n", &*m_projectile, m_projectile == nullptr);
+}
+
+void CanFire::fire(Array2f startPosition) {
+    m_projectile->isActive = true;
+    float offset = m_projectile->getHeight() / 2;
+    m_projectile->setPosition(startPosition + (m_firesUp ? +offset : -offset));
+}
+
+Player::Player(Array2f widthHeight, Array2f position, Array3f color) :
+    Entity(widthHeight, position, color), CanFire(true) {}
+
+void Player::update(int ticks)  {
+    // printf("%p %d\n", &*m_projectile, m_projectile == nullptr);
+    if (m_projectile->isActive) {
+        // m_projectile->update(ticks);
+    }
+}
 
 void Player::takeStep(bool toTheRight) {
     m_position.x() += toTheRight ? +.1 : -.1;

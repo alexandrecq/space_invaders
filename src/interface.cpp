@@ -95,11 +95,14 @@ bool Interface::keyboardEvent() const {
     if (ImGui::GetIO().WantCaptureKeyboard) {
             return false;
     }
-    if (ImGui::IsKeyPressed(ImGuiKey_S)) {
+    if (ImGui::IsKeyPressed(ImGuiKey_A)) {
         m_player->takeStep(false);
     }
-    if (ImGui::IsKeyPressed(ImGuiKey_F)) {
+    if (ImGui::IsKeyPressed(ImGuiKey_D)) {
         m_player->takeStep(true);
+    }
+    if (ImGui::IsKeyPressed(ImGuiKey_W)) {
+        m_player->fire(m_player->getPosition());
     }
     return false;
 }

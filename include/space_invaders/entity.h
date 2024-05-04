@@ -17,6 +17,10 @@ public:
 	virtual void update(int ticks) = 0;
 	void draw(Interface* interface) const;
 
+	Array2f getPosition() const;
+	void setPosition(Array2f position);
+	float getHeight();
+
 protected:
 	const Array2f m_widthHeight{.01, .01};
 	Array2f m_position;
@@ -25,11 +29,31 @@ private:
 };
 
 
-class Player : public Entity {
+class Projectile : public Entity {
+public:
+	Projectile(Array2f widthHeight, Array2f position, Array3f color);
+	void update(int ticks) override;
+
+	bool isActive = false;
+private:
+};
+
+class CanFire {
+public:
+	CanFire(bool firesUp);
+	void fire(Array2f startPosition);
+protected:
+	std::unique_ptr<Projectile> m_projectile = nullptr;
+	bool m_firesUp;
+};
+
+
+class Player : public Entity, public CanFire {
 public:
 	Player(Array2f widthHeight, Array2f position, Array3f color);
 	void update(int ticks) override;
 	void takeStep(bool toTheRight);
+	// void fire();
 private:
 	int m_num_lives = 3;
 };
