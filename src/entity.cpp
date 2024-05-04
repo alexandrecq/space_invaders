@@ -7,22 +7,11 @@ Entity::Entity(Array2f widthHeight, Array2f position, Array3f color) :
     m_position(position), m_widthHeight(widthHeight), m_color(color) {}
 
 void Entity::draw(Interface* interface) const {
+    if (!m_active) return;
     // printf("m_position: (%.2f, %.2f)\n", m_position.x(), m_position.y());
     // printf("m_widthHeight: (%.2f, %.2f)\n", m_widthHeight.x(), m_widthHeight.y());
     auto bottomLeft = m_position - m_widthHeight / 2;
     interface->drawRectangle(bottomLeft, m_widthHeight, m_color);
-}
-
-Array2f Entity::getPosition() const {
-    return m_position;
-}
-
-void Entity::setPosition(Array2f position) {
-    m_position = position;
-}
-
-float Entity::getHeight() {
-    return m_widthHeight.y();
 }
 
 
@@ -36,14 +25,18 @@ CanFire::CanFire(bool firesUp) : m_firesUp(firesUp){
     Array2f widthHeight{.01, .1};
     Array2f position{0, 0};
     Array3f color{1., 1., 1.};
-    m_projectile = std::make_unique<Projectile>(widthHeight, position, color);
-    // printf("CanFire constructor: %p, %d\n", &*m_projectile, m_projectile == nullptr);
+    m_projectile = std::make_shared<Projectile>(widthHeight, position, color);
+    m_projectile->setActive(false);
 }
 
-void CanFire::fire(Array2f startPosition) {
-    m_projectile->isActive = true;
-    float offset = m_projectile->getHeight() / 2;
-    m_projectile->setPosition(startPosition + (m_firesUp ? +offset : -offset));
+std::shared_ptr<Projectile> CanFire::getProjectile() {
+    return m_projectile;
+}
+
+void CanFire::fire(Array2f sourcePosition, Array2f sourceWidthHeight) {
+    m_projectile->setActive(true);
+    float offset = sourceWidthHeight.y() / 2 + m_projectile->getWidthHeight().y() / 2;
+    m_projectile->setPosition({sourcePosition.x(), sourcePosition.y() + (m_firesUp ? +offset : -offset)});
 }
 
 Player::Player(Array2f widthHeight, Array2f position, Array3f color) :
@@ -51,9 +44,9 @@ Player::Player(Array2f widthHeight, Array2f position, Array3f color) :
 
 void Player::update(int ticks)  {
     // printf("%p %d\n", &*m_projectile, m_projectile == nullptr);
-    if (m_projectile->isActive) {
+    // if (m_projectile->isActive) {
         // m_projectile->update(ticks);
-    }
+    // }
 }
 
 void Player::takeStep(bool toTheRight) {

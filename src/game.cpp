@@ -19,6 +19,8 @@ void Game::initPlayer() {
     auto player = std::make_shared<Player>(playerWidthHeight, playerStartPosition, playerColor);
     m_entities.push_back(player);
     m_interface->setPlayer(player);
+
+    m_entities.push_back(player->getProjectile());
 }
 
 void Game::initAlienGrid(const int numRows, const int numCols) {

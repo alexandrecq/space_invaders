@@ -17,15 +17,18 @@ public:
 	virtual void update(int ticks) = 0;
 	void draw(Interface* interface) const;
 
-	Array2f getPosition() const;
-	void setPosition(Array2f position);
-	float getHeight();
+	void setPosition(Array2f position) { m_position = position; }
+	Array2f getPosition() const { return m_position; }
+	Array2f getWidthHeight() const { return m_widthHeight; }
+	void setActive(bool active) { m_active = active; }
+	bool isActive() const { return m_active; }
 
 protected:
 	const Array2f m_widthHeight{.01, .01};
 	Array2f m_position;
 	Array3f m_color;
 private:
+	bool m_active = true;
 };
 
 
@@ -33,18 +36,16 @@ class Projectile : public Entity {
 public:
 	Projectile(Array2f widthHeight, Array2f position, Array3f color);
 	void update(int ticks) override;
-
-	bool isActive = false;
-private:
 };
 
 class CanFire {
 public:
 	CanFire(bool firesUp);
-	void fire(Array2f startPosition);
+	std::shared_ptr<Projectile> getProjectile();
+	void fire(Array2f sourcePosition, Array2f sourceWidthHeight);
 protected:
-	std::unique_ptr<Projectile> m_projectile = nullptr;
 	bool m_firesUp;
+	std::shared_ptr<Projectile> m_projectile = nullptr;
 };
 
 
@@ -53,7 +54,6 @@ public:
 	Player(Array2f widthHeight, Array2f position, Array3f color);
 	void update(int ticks) override;
 	void takeStep(bool toTheRight);
-	// void fire();
 private:
 	int m_num_lives = 3;
 };

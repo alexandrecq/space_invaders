@@ -102,7 +102,7 @@ bool Interface::keyboardEvent() const {
         m_player->takeStep(true);
     }
     if (ImGui::IsKeyPressed(ImGuiKey_W)) {
-        m_player->fire(m_player->getPosition());
+        m_player->fire(m_player->getPosition(), m_player->getWidthHeight());
     }
     return false;
 }
