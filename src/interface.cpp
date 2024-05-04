@@ -80,14 +80,14 @@ void Interface::renderFrame() const {
 }
 
 void Interface::drawRectangle(
-    Eigen::Vector2f topLeft, Eigen::Vector2f widthHeight, Eigen::Vector3f color
+    Eigen::Array2f bottomLeft, Eigen::Array2f widthHeight, Eigen::Array3f color
     ) const {
     glBegin(GL_QUADS);
     glColor3f(color.x(), color.y(), color.z());
-    glVertex2f(topLeft.x(), topLeft.y());
-    glVertex2f(topLeft.x(), topLeft.y() - widthHeight.y());
-    glVertex2f(topLeft.x() + widthHeight.x(), topLeft.y() - widthHeight.y());
-    glVertex2f(topLeft.x() + widthHeight.x(), topLeft.y());
+    glVertex2f(bottomLeft.x(), bottomLeft.y());
+    glVertex2f(bottomLeft.x(), bottomLeft.y() + widthHeight.y());
+    glVertex2f(bottomLeft.x() + widthHeight.x(), bottomLeft.y() + widthHeight.y());
+    glVertex2f(bottomLeft.x() + widthHeight.x(), bottomLeft.y());
     glEnd();
 }
 

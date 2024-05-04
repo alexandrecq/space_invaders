@@ -31,9 +31,8 @@ add_library(imgui ${IMGUI_SOURCES} ${IMGUI_HEADERS})
 # Include directories for SpaceInvaders headers
 include_directories(include)
 
-# # Set the path to the directory containing Eigen headers
-# set(EIGEN_INCLUDE_DIR "/usr/include/eigen3/")
-
+# Set the path to the directory containing Eigen headers
+set(EIGEN_INCLUDE_DIR "/usr/include/eigen3/")
 # Find Eigen include directory
 find_path(EIGEN_INCLUDE_DIR NAMES Eigen/Core PATHS /usr/include /usr/local/include /opt/local/include)
 if(EIGEN_INCLUDE_DIR)

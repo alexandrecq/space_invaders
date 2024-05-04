@@ -1,56 +1,50 @@
 #include "space_invaders/entity.h"
 #include "space_invaders/interface.h"
 
-Entity::Entity(Interface* interface) : m_interface(interface) {}
 
-Entity::Entity(Interface* interface, Vector2f position) : m_interface(interface), m_position(position) {}
+Entity::Entity(Array2f widthHeight, Array2f position, Array3f color) :
+    m_position(position), m_widthHeight(widthHeight), m_color(color) {}
 
+void Entity::draw(Interface* interface) const {
+    // printf("m_position: (%.2f, %.2f)\n", m_position.x(), m_position.y());
+    // printf("m_widthHeight: (%.2f, %.2f)\n", m_widthHeight.x(), m_widthHeight.y());
+    auto bottomLeft = m_position - m_widthHeight / 2;
+    interface->drawRectangle(bottomLeft, m_widthHeight, m_color);
+}
 
-Player::Player(Interface* interface) : Entity(interface) {}
+Player::Player(Array2f widthHeight, Array2f position, Array3f color) :
+    Entity(widthHeight, position, color) {}
 
 void Player::update(int ticks)  {}
 
-void Player::draw() const {
-    m_interface->drawRectangle(m_position, m_width_height, m_color);
-}
-
 void Player::takeStep(bool toTheRight) {
     m_position.x() += toTheRight ? +.1 : -.1;
+    m_position.x() = fmin(m_position.x(),  1 - m_widthHeight.x() / 2);
+    m_position.x() = fmax(m_position.x(), -1 + m_widthHeight.x() / 2);
 }
 
 
-Alien::Alien(Interface* interface) : Entity(interface)  {
-    m_position = {-1, 1};
-}
-
-Alien::Alien(Interface* interface, Vector2f position, Vector2f width_height,
-             Vector2f step_size, int num_steps_til_reverse) :
-    Entity(interface, position), m_step_size(step_size), m_width_height(width_height),
-    m_num_steps_til_reverse(num_steps_til_reverse)
+Alien::Alien(Array2f widthHeight,Array2f position, Array3f color,
+             Array2f stepSize, int numStepsTilReverse) :
+    Entity(widthHeight, position, color),
+    m_stepSize(stepSize), m_numStepsTilReverse(numStepsTilReverse)
 {}
 
 void Alien::update(int ticks)  {
     // printf("ticks: %d, pos: (%.2f, %.2f)\n", ticks, m_position.x(), m_position.y());
-    if (ticks - m_last_step_tick > m_step_every_ticks) {
-        if (m_steps_taken == m_num_steps_til_reverse) {
-            m_position.y() += m_step_size.y();
-            m_step_size.x() *= -1;
-            m_steps_taken = 0;
+    if (ticks - m_lastStepTick > m_stepEveryTicks) {
+        if (m_stepsTaken == m_numStepsTilReverse) {
+            m_position.y() += m_stepSize.y();
+            m_stepSize.x() *= -1;
+            m_stepsTaken = 0;
         } else {
-            m_position.x() += m_step_size.x();
-            m_steps_taken += 1;
+            m_position.x() += m_stepSize.x();
+            m_stepsTaken += 1;
         }
-        m_last_step_tick = ticks;
+        m_lastStepTick = ticks;
     }
 }
 
-void Alien::draw() const {
-    m_interface->drawRectangle(m_position, m_width_height, m_color);
-}
-
-Barrier::Barrier(Interface* interface, Vector2f position) : Entity(interface, position) {}
+Barrier::Barrier(Array2f widthHeight, Array2f position, Array3f color) :
+    Entity(widthHeight, position, color) {}
 void Barrier::update(int ticks)  {}
-void Barrier::draw() const {
-    m_interface->drawRectangle(m_position, m_width_height, m_color);
-}
-

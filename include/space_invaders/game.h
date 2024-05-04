@@ -13,10 +13,11 @@ class Game {
 public:
 	Game();
 	void run();
-	void initAlienGrid(int num_rows = 5, int num_cols = 10);
+	void initPlayer();
+	void initAlienGrid(const int num_rows = 5, const int num_cols = 10);
+	void initBarriers(const int numBarriers = 4);
 private:
-	Interface m_interface;
-	// std::shared_ptr<Interface> m_interface;
+	std::shared_ptr<Interface> m_interface = nullptr;
 	
 	// static constexpr int m_max_entities = 10;
 	// std::shared_ptr<Entity> m_entities[m_num_entities];
