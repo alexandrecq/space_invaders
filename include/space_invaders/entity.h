@@ -1,11 +1,15 @@
 #pragma once
 
-#include "memory"
+#include <random>
+#include <memory>
 
 #include <Eigen/Dense>
+#include <vector>
 
 using Eigen::Array2f;
 using Eigen::Array3f;
+using std::vector;
+using std::shared_ptr;
 
 class Interface;
 
@@ -34,18 +38,25 @@ private:
 
 class Projectile : public Entity {
 public:
-	Projectile(Array2f widthHeight, Array2f position, Array3f color);
+	Projectile(Array2f widthHeight, Array2f position, Array3f color, float m_vertStepSize);
 	void update(int ticks) override;
+	void setTargets(vector<shared_ptr<Entity>> targets) { m_targets = targets; }
+private:
+	const int m_stepEveryTicks = 1;
+	float m_vertStepSize;
+	int m_lastStepTick = 0;
+	vector<shared_ptr<Entity>> m_targets;
 };
 
 class CanFire {
 public:
 	CanFire(bool firesUp);
-	std::shared_ptr<Projectile> getProjectile();
+	shared_ptr<Projectile> getProjectile() { return m_projectile; }
+	void setProjectileTargets(vector<shared_ptr<Entity>> targets) { m_projectile->setTargets(targets); }
 	void fire(Array2f sourcePosition, Array2f sourceWidthHeight);
 protected:
 	bool m_firesUp;
-	std::shared_ptr<Projectile> m_projectile = nullptr;
+	shared_ptr<Projectile> m_projectile = nullptr;
 };
 
 
@@ -58,17 +69,22 @@ private:
 	int m_num_lives = 3;
 };
 
-class Alien : public Entity {
+class Alien : public Entity , public CanFire {
 public:
 	Alien(Array2f widthHeight, Array2f position, Array3f color,
 		Array2f stepSize, int numStepsTilReverse);
 	void update(int ticks) override;
 private:
 	const int m_stepEveryTicks = 1000;
-	const int m_numStepsTilReverse = 3;
-	int m_lastStepTick = 0;
-	int m_stepsTaken = 0;
 	Array2f m_stepSize{.1, -.1};
+	int m_lastStepTick = 0;
+
+	const int m_numStepsTilReverse = 3;
+	int m_stepsTaken = 0;
+
+	std::mt19937 m_gen;
+	std::uniform_int_distribution<int> m_distribution;
+	const int m_fireProbability = 1;
 };
 
 class Barrier : public Entity {

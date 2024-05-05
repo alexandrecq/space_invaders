@@ -1,6 +1,10 @@
 #include "space_invaders/game.h"
 #include "space_invaders/entity.h"
 
+#include <iostream>
+#include <iterator>
+#include <memory>
+
 Game::Game() {
     m_interface = std::make_shared<Interface>();
     m_start_time = std::chrono::steady_clock::now();
@@ -9,6 +13,7 @@ Game::Game() {
     initAlienGrid();
     initBarriers();
 
+    setPlayerTargets();
 }
 
 void Game::initPlayer() {
@@ -16,11 +21,19 @@ void Game::initPlayer() {
     const Array2f playerStartPosition{0, -1 + playerWidthHeight.y() / 2};
     const Array3f playerColor{0., .1, 1.};
 
-    auto player = std::make_shared<Player>(playerWidthHeight, playerStartPosition, playerColor);
-    m_entities.push_back(player);
-    m_interface->setPlayer(player);
+    m_player = std::make_shared<Player>(playerWidthHeight, playerStartPosition, playerColor);
+    m_entities.push_back(m_player);
+    m_interface->setPlayer(m_player);
 
-    m_entities.push_back(player->getProjectile());
+    m_entities.push_back(m_player->getProjectile());
+}
+
+void Game::setPlayerTargets() {
+    vector<shared_ptr<Entity>> playerTargets;
+    std::copy(m_aliens.begin(), m_aliens.end(), std::back_inserter(playerTargets));
+    std::copy(m_barriers.begin(), m_barriers.end(), std::back_inserter(playerTargets));
+    // printf("setPlayerTargets: %p %lu\n", playerTargets.get(), playerTargets->size());
+    m_player->setProjectileTargets(playerTargets);
 }
 
 void Game::initAlienGrid(const int numRows, const int numCols) {
@@ -48,6 +61,8 @@ void Game::initAlienGrid(const int numRows, const int numCols) {
                 numStepsTilReverse
             );
             m_entities.push_back(alien);
+            m_entities.push_back(alien->getProjectile());
+            m_aliens.push_back(alien);
         }
     }
 }
@@ -60,7 +75,9 @@ void Game::initBarriers(const int numBarriers) {
 
     for (int idx = 0; idx < numBarriers; idx++) {
         const Array2f barrierPosition{-1 + (idx + 1) * incX, midlineY};
-        m_entities.push_back(std::make_shared<Barrier>(barrierWidthHeight, barrierPosition, barrierColor));
+        auto barrier = std::make_shared<Barrier>(barrierWidthHeight, barrierPosition, barrierColor);
+        m_entities.push_back(barrier);
+        m_barriers.push_back(barrier);
     }
 }
 
