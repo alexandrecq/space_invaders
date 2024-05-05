@@ -6,10 +6,8 @@
 Entity::Entity(Array2f widthHeight, Array2f position, Array3f color) :
     m_position(position), m_widthHeight(widthHeight), m_color(color) {}
 
-void Entity::draw(Interface* interface) const {
+void Entity::draw(Interface const *interface) const {
     if (!m_active) return;
-    // printf("m_position: (%.2f, %.2f)\n", m_position.x(), m_position.y());
-    // printf("m_widthHeight: (%.2f, %.2f)\n", m_widthHeight.x(), m_widthHeight.y());
     auto bottomLeft = m_position - m_widthHeight / 2;
     interface->drawRectangle(bottomLeft, m_widthHeight, m_color);
 }
@@ -29,20 +27,17 @@ void Projectile::update(int ticks)  {
         // printf("proj update: %p, %lu\n", m_targets.get(), m_targets->size());
         //check collisions
     }
-    if (ticks - m_lastStepTick > m_stepEveryTicks) {
-        m_position.y() += m_vertStepSize;
-        m_lastStepTick = ticks;
-    }
+    m_position.y() += m_vertStepSize;
 }
 
 
 EntityThatFires::EntityThatFires(Array2f widthHeight, Array2f position, Array3f color, bool firesUp) :
     Entity(widthHeight, position, color), m_firesUp(firesUp) {
     //set default values for projectile
-    Array2f projectileWidthHeight{.01, .05};
-    Array2f projectilePosition{0, 0};
-    Array3f projectileColor{1., 1., 1.};
-    float vertStepSize((firesUp ? +1 : -1) * .01);
+    const Array2f projectileWidthHeight{.01, .05};
+    const Array2f projectilePosition{0, 0};
+    const Array3f projectileColor{1., 1., 1.};
+    const float vertStepSize((firesUp ? +1 : -1) * .01);
     m_projectile = std::make_shared<Projectile>(projectileWidthHeight, projectilePosition, projectileColor, vertStepSize);
     m_projectile->setActive(false);
 }
@@ -78,7 +73,7 @@ Alien::Alien(Array2f widthHeight,Array2f position, Array3f color,
 {
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<int> dist(1, 1000);
+    std::uniform_int_distribution<int> dist(1, 100000);
     m_gen = gen;
     m_distribution = dist;
 

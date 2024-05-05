@@ -19,7 +19,7 @@ public:
 	// virtual ~Entity() = default;
 	Entity(Array2f widthHeight, Array2f position, Array3f color);
 	virtual void update(int ticks) = 0;
-	void draw(Interface* interface) const;
+	void draw(Interface const *interface) const;
 
 	void setPosition(Array2f position) { m_position = position; }
 	Array2f getPosition() const { return m_position; }
@@ -49,9 +49,7 @@ public:
 	void update(int ticks) override;
 	void setTargets(vector<shared_ptr<Entity>> targets) { m_targets = targets; }
 private:
-	const int m_stepEveryTicks = 1;
 	float m_vertStepSize;
-	int m_lastStepTick = 0;
 	vector<shared_ptr<Entity>> m_targets;
 };
 
@@ -87,11 +85,11 @@ private:
 	Array2f m_stepSize{.1, -.1};
 	int m_lastStepTick = 0;
 
-	const int m_numStepsTilReverse = 3;
+	const int m_numStepsTilReverse;
 	int m_stepsTaken = 0;
 
 	std::mt19937 m_gen;
 	std::uniform_int_distribution<int> m_distribution;
-	const int m_fireProbability = 1;
+	const int m_fireProbability = 1000;
 };
 

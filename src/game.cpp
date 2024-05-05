@@ -1,12 +1,11 @@
 #include "space_invaders/game.h"
 #include "space_invaders/entity.h"
 
-#include <iostream>
 #include <iterator>
-#include <memory>
+#include <thread>
+
 
 Game::Game() {
-    m_interface = std::make_shared<Interface>();
     m_start_time = std::chrono::steady_clock::now();
 
     initPlayer();
@@ -14,6 +13,7 @@ Game::Game() {
     initBarriers();
 
     setPlayerTargets();
+    setAlienTargets();
 }
 
 void Game::initPlayer() {
@@ -23,7 +23,7 @@ void Game::initPlayer() {
 
     m_player = std::make_shared<Player>(playerWidthHeight, playerStartPosition, playerColor);
     m_entities.push_back(m_player);
-    m_interface->setPlayer(m_player);
+    m_interface.setPlayer(m_player);
 
     m_entities.push_back(m_player->getProjectile());
 }
@@ -32,8 +32,15 @@ void Game::setPlayerTargets() {
     vector<shared_ptr<Entity>> playerTargets;
     std::copy(m_aliens.begin(), m_aliens.end(), std::back_inserter(playerTargets));
     std::copy(m_barriers.begin(), m_barriers.end(), std::back_inserter(playerTargets));
-    // printf("setPlayerTargets: %p %lu\n", playerTargets.get(), playerTargets->size());
     m_player->setProjectileTargets(playerTargets);
+}
+
+void Game::setAlienTargets() {
+    vector<shared_ptr<Entity>> alienTargets{m_player};
+    std::copy(m_barriers.begin(), m_barriers.end(), std::back_inserter(alienTargets));
+    for (auto alien : m_aliens) {
+        alien->setProjectileTargets(alienTargets);
+    }
 }
 
 void Game::initAlienGrid(const int numRows, const int numCols) {
@@ -82,19 +89,19 @@ void Game::initBarriers(const int numBarriers) {
 }
 
 void Game::run() {
-    while (m_interface->isAlive()) {
+    while (m_interface.isAlive()) {
         std::this_thread::sleep_for(std::chrono::milliseconds(m_tick_ms));
         auto elapsed = std::chrono::steady_clock::now() - m_start_time;
         auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed);
         // printf("Elapsed: %.2ld\n", elapsed_ms.count());
 
-        m_interface->startFrame();
+        m_interface.startFrame();
         for (auto entity : m_entities) {
             if (entity) {
                 entity->update(elapsed_ms.count());
-                entity->draw(m_interface.get());
+                entity->draw(&m_interface);
             }
         }
-        m_interface->renderFrame();
+        m_interface.renderFrame();
     }
 }
