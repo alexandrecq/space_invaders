@@ -36,6 +36,13 @@ private:
 };
 
 
+class Barrier : public Entity {
+public:
+	Barrier(Array2f widthHeight, Array2f position, Array3f color);
+	void update(int ticks) override;
+};
+
+
 class Projectile : public Entity {
 public:
 	Projectile(Array2f widthHeight, Array2f position, Array3f color, float m_vertStepSize);
@@ -48,19 +55,20 @@ private:
 	vector<shared_ptr<Entity>> m_targets;
 };
 
-class CanFire {
+
+class EntityThatFires : public Entity {
 public:
-	CanFire(bool firesUp);
+	EntityThatFires(Array2f widthHeight, Array2f position, Array3f color, bool firesUp);
 	shared_ptr<Projectile> getProjectile() { return m_projectile; }
 	void setProjectileTargets(vector<shared_ptr<Entity>> targets) { m_projectile->setTargets(targets); }
-	void fire(Array2f sourcePosition, Array2f sourceWidthHeight);
+	void fire();
 protected:
 	bool m_firesUp;
 	shared_ptr<Projectile> m_projectile = nullptr;
 };
 
 
-class Player : public Entity, public CanFire {
+class Player : public EntityThatFires {
 public:
 	Player(Array2f widthHeight, Array2f position, Array3f color);
 	void update(int ticks) override;
@@ -69,7 +77,7 @@ private:
 	int m_num_lives = 3;
 };
 
-class Alien : public Entity , public CanFire {
+class Alien : public EntityThatFires {
 public:
 	Alien(Array2f widthHeight, Array2f position, Array3f color,
 		Array2f stepSize, int numStepsTilReverse);
@@ -87,9 +95,3 @@ private:
 	const int m_fireProbability = 1;
 };
 
-class Barrier : public Entity {
-public:
-	Barrier(Array2f widthHeight, Array2f position, Array3f color);
-	void update(int ticks) override;
-private:
-};

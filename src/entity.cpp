@@ -15,6 +15,12 @@ void Entity::draw(Interface* interface) const {
 }
 
 
+Barrier::Barrier(Array2f widthHeight, Array2f position, Array3f color) :
+    Entity(widthHeight, position, color) {}
+
+void Barrier::update(int ticks)  {}
+
+
 Projectile::Projectile(Array2f widthHeight, Array2f position, Array3f color, float vertStepSize) :
     Entity(widthHeight, position, color), m_vertStepSize(vertStepSize) {}
 
@@ -30,7 +36,8 @@ void Projectile::update(int ticks)  {
 }
 
 
-CanFire::CanFire(bool firesUp) : m_firesUp(firesUp){
+EntityThatFires::EntityThatFires(Array2f widthHeight, Array2f position, Array3f color, bool firesUp) :
+    Entity(widthHeight, position, color), m_firesUp(firesUp) {
     //set default values for projectile
     Array2f projectileWidthHeight{.01, .05};
     Array2f projectilePosition{0, 0};
@@ -40,15 +47,15 @@ CanFire::CanFire(bool firesUp) : m_firesUp(firesUp){
     m_projectile->setActive(false);
 }
 
-void CanFire::fire(Array2f sourcePosition, Array2f sourceWidthHeight) {
+void EntityThatFires::fire() {
     m_projectile->setActive(true);
-    float offset = sourceWidthHeight.y() / 2 + m_projectile->getWidthHeight().y() / 2;
-    m_projectile->setPosition({sourcePosition.x(), sourcePosition.y() + (m_firesUp ? +offset : -offset)});
+    float offset = m_widthHeight.y() / 2 + m_projectile->getWidthHeight().y() / 2;
+    m_projectile->setPosition({m_position.x(), m_position.y() + (m_firesUp ? +offset : -offset)});
 }
 
 
 Player::Player(Array2f widthHeight, Array2f position, Array3f color) :
-    Entity(widthHeight, position, color), CanFire(true) {}
+    EntityThatFires(widthHeight, position, color, true) {}
 
 void Player::update(int ticks)  {
     // printf("%p %d\n", &*m_projectile, m_projectile == nullptr);
@@ -66,7 +73,7 @@ void Player::takeStep(bool toTheRight) {
 
 Alien::Alien(Array2f widthHeight,Array2f position, Array3f color,
              Array2f stepSize, int numStepsTilReverse) :
-    Entity(widthHeight, position, color), CanFire(false),
+    EntityThatFires(widthHeight, position, color, false),
     m_stepSize(stepSize), m_numStepsTilReverse(numStepsTilReverse)
 {
     std::random_device rd;
@@ -80,7 +87,7 @@ Alien::Alien(Array2f widthHeight,Array2f position, Array3f color,
 void Alien::update(int ticks)  {
     const int randomNumber = m_distribution(m_gen);
     if (randomNumber <= m_fireProbability) {
-        fire(m_position, m_widthHeight);
+        fire();
     }
 
     if (ticks - m_lastStepTick > m_stepEveryTicks) {
@@ -96,6 +103,3 @@ void Alien::update(int ticks)  {
     }
 }
 
-Barrier::Barrier(Array2f widthHeight, Array2f position, Array3f color) :
-    Entity(widthHeight, position, color) {}
-void Barrier::update(int ticks)  {}
