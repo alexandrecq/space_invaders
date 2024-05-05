@@ -14,6 +14,7 @@ Game::Game() {
 
     setPlayerTargets();
     setAlienTargets();
+
 }
 
 void Game::initPlayer() {

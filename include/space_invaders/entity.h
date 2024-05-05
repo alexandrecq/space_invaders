@@ -2,12 +2,10 @@
 
 #include <random>
 #include <memory>
-
-#include <Eigen/Dense>
 #include <vector>
 
-using Eigen::Array2f;
-using Eigen::Array3f;
+#include "space_invaders/aabb.h"
+
 using std::vector;
 using std::shared_ptr;
 
@@ -20,6 +18,8 @@ public:
 	Entity(Array2f widthHeight, Array2f position, Array3f color);
 	virtual void update(int ticks) = 0;
 	void draw(Interface const *interface) const;
+	AABB aabb() const;
+	void hit();
 
 	void setPosition(Array2f position) { m_position = position; }
 	Array2f getPosition() const { return m_position; }
@@ -31,8 +31,8 @@ protected:
 	const Array2f m_widthHeight{.01, .01};
 	Array2f m_position;
 	Array3f m_color;
-private:
 	bool m_active = true;
+private:
 };
 
 
@@ -74,6 +74,7 @@ public:
 private:
 	int m_num_lives = 3;
 };
+
 
 class Alien : public EntityThatFires {
 public:

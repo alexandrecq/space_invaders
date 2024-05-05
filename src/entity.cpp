@@ -12,6 +12,14 @@ void Entity::draw(Interface const *interface) const {
     interface->drawRectangle(bottomLeft, m_widthHeight, m_color);
 }
 
+AABB Entity::aabb() const {
+    return AABB(m_position - m_widthHeight / 2, m_position + m_widthHeight / 2);
+}
+
+void Entity::hit() {
+    m_active = false;
+}
+
 
 Barrier::Barrier(Array2f widthHeight, Array2f position, Array3f color) :
     Entity(widthHeight, position, color) {}
@@ -23,9 +31,20 @@ Projectile::Projectile(Array2f widthHeight, Array2f position, Array3f color, flo
     Entity(widthHeight, position, color), m_vertStepSize(vertStepSize) {}
 
 void Projectile::update(int ticks)  {
+    if (!m_active) return;
     if (m_targets.size()) {
-        // printf("proj update: %p, %lu\n", m_targets.get(), m_targets->size());
+        // printf("proj update: %lu\n", m_targets.size());
         //check collisions
+        for (auto target : m_targets) {
+            if (!target->isActive()) continue;
+            if (aabb().intersects(target->aabb())) {
+                // printf("hit: %lu\n", m_targets.size());
+                // aabb().print();
+                // target->aabb().print();
+                m_active = false;
+                target->hit();
+            }
+        }
     }
     m_position.y() += m_vertStepSize;
 }
@@ -43,6 +62,7 @@ EntityThatFires::EntityThatFires(Array2f widthHeight, Array2f position, Array3f 
 }
 
 void EntityThatFires::fire() {
+    if (!m_active) return;
     m_projectile->setActive(true);
     float offset = m_widthHeight.y() / 2 + m_projectile->getWidthHeight().y() / 2;
     m_projectile->setPosition({m_position.x(), m_position.y() + (m_firesUp ? +offset : -offset)});
