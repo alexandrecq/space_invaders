@@ -3,6 +3,8 @@
 #include "space_invaders/interface.h"
 
 
+static const AABB gameAABB({-1, -1}, {1, 1});
+
 Entity::Entity(Array2f widthHeight, Array2f position, Array3f color) :
     m_position(position), m_widthHeight(widthHeight), m_color(color) {}
 
@@ -17,12 +19,15 @@ AABB Entity::aabb() const {
 }
 
 void Entity::hit() {
-    m_active = false;
+    m_num_lives--;
+    if (m_num_lives == 0) m_active = false;
 }
 
 
 Barrier::Barrier(Array2f widthHeight, Array2f position, Array3f color) :
-    Entity(widthHeight, position, color) {}
+    Entity(widthHeight, position, color) {
+    m_num_lives = 5;
+}
 
 void Barrier::update(int ticks)  {}
 
@@ -33,20 +38,17 @@ Projectile::Projectile(Array2f widthHeight, Array2f position, Array3f color, flo
 void Projectile::update(int ticks)  {
     if (!m_active) return;
     if (m_targets.size()) {
-        // printf("proj update: %lu\n", m_targets.size());
-        //check collisions
+        //check collision with any targets
         for (auto target : m_targets) {
             if (!target->isActive()) continue;
             if (aabb().intersects(target->aabb())) {
-                // printf("hit: %lu\n", m_targets.size());
-                // aabb().print();
-                // target->aabb().print();
                 m_active = false;
                 target->hit();
             }
         }
     }
     m_position.y() += m_vertStepSize;
+    if (!aabb().intersects(gameAABB)) m_active = false;
 }
 
 
@@ -62,7 +64,7 @@ EntityThatFires::EntityThatFires(Array2f widthHeight, Array2f position, Array3f 
 }
 
 void EntityThatFires::fire() {
-    if (!m_active) return;
+    if (!m_active || m_projectile->isActive()) return;
     m_projectile->setActive(true);
     float offset = m_widthHeight.y() / 2 + m_projectile->getWidthHeight().y() / 2;
     m_projectile->setPosition({m_position.x(), m_position.y() + (m_firesUp ? +offset : -offset)});
@@ -70,13 +72,12 @@ void EntityThatFires::fire() {
 
 
 Player::Player(Array2f widthHeight, Array2f position, Array3f color) :
-    EntityThatFires(widthHeight, position, color, true) {}
+    EntityThatFires(widthHeight, position, color, true) {
+    m_num_lives = 3;
+}
 
 void Player::update(int ticks)  {
-    // printf("%p %d\n", &*m_projectile, m_projectile == nullptr);
-    // if (m_projectile->isActive) {
-        // m_projectile->update(ticks);
-    // }
+    if (!m_active) return;
 }
 
 void Player::takeStep(bool toTheRight) {
@@ -100,6 +101,7 @@ Alien::Alien(Array2f widthHeight,Array2f position, Array3f color,
 }
 
 void Alien::update(int ticks)  {
+    if (!m_active) return;
     const int randomNumber = m_distribution(m_gen);
     if (randomNumber <= m_fireProbability) {
         fire();
