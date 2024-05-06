@@ -32,6 +32,7 @@ protected:
 	Array2f m_position;
 	Array3f m_color;
 	bool m_active = true;
+	int m_num_lives = 1;
 private:
 };
 
@@ -71,8 +72,6 @@ public:
 	Player(Array2f widthHeight, Array2f position, Array3f color);
 	void update(int ticks) override;
 	void takeStep(bool toTheRight);
-private:
-	int m_num_lives = 3;
 };
 
 
@@ -91,6 +90,6 @@ private:
 
 	std::mt19937 m_gen;
 	std::uniform_int_distribution<int> m_distribution;
-	const int m_fireProbability = 1000;
+	const int m_fireProbability = 100;
 };
 
