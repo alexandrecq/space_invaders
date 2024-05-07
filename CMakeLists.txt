@@ -18,15 +18,15 @@ file(GLOB IMGUI_HEADERS
 include_directories(${IMGUI_DIR} ${IMGUI_DIR}/backends)
 add_library(imgui ${IMGUI_SOURCES} ${IMGUI_HEADERS})
 
-# # Find stb_image header file
-# find_path(STB_IMAGE_INCLUDE_DIR stb_image.h)
-# if(STB_IMAGE_INCLUDE_DIR)
-#     message(STATUS "Found stb_image.h: ${STB_IMAGE_INCLUDE_DIR}")
-# else()
-#     message(FATAL_ERROR "stb_image.h not found")
-# endif()
-# # Include the directory containing the stb_image header file
-# include_directories(${STB_IMAGE_INCLUDE_DIR})
+# Find stb_image header file
+set(STB_IMAGE_INCLUDE_DIR "dependencies/stb")
+find_path(STB_IMAGE_INCLUDE_DIR stb_image.h)
+if(STB_IMAGE_INCLUDE_DIR)
+    message(STATUS "Found stb_image.h: ${STB_IMAGE_INCLUDE_DIR}")
+else()
+    message(FATAL_ERROR "stb_image.h not found")
+endif()
+include_directories(${STB_IMAGE_INCLUDE_DIR})
 
 # Include directories for SpaceInvaders headers
 include_directories(include)

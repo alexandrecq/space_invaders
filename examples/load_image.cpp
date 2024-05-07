@@ -36,3 +36,18 @@ bool LoadTextureFromFile(const char* filename, GLuint* out_texture, int* out_wid
     return true;
 }
 
+
+void display_in_imgui() {
+    GLuint out_texture;
+    int out_width, out_height;
+    const std::string filename("../assets/zeros10x10x3.png");
+    bool loaded = LoadTextureFromFile(filename.c_str(), &out_texture, &out_width, &out_height);
+    printf("%d: (%d, %d)\n", loaded, out_width, out_width);
+    IM_ASSERT(loaded);
+
+    ImGui::Begin("OpenGL Texture Text");
+    ImGui::Text("pointer = %x", out_texture);
+    ImGui::Text("size = %d x %d", out_width, out_height);
+    ImGui::Image((void*)(intptr_t)out_texture, ImVec2(out_width, out_height));
+    ImGui::End();
+}

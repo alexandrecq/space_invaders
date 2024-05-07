@@ -1,6 +1,9 @@
+#include <assert.h>
+#include <string>
 #include <GL/glut.h>
 
 GLuint textureID; // Texture ID for the texture atlas
+bool LoadTextureFromFile(const char* filename, GLuint* out_texture, int* out_width, int* out_height);
 
 void init() {
     glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -9,7 +12,13 @@ void init() {
     // Load texture atlas
     // You need to implement the function to load your texture atlas
     // For simplicity, let's assume you have a function loadTextureAtlas()
-    textureID = loadTextureAtlas("texture_atlas.png"); // Load texture atlas image
+    // textureID = loadTextureAtlas("texture_atlas.png"); // Load texture atlas image
+    GLuint out_texture;
+    int out_width, out_height;
+    const std::string filename("../assets/zeros10x10x3.png");
+    bool loaded = LoadTextureFromFile(filename.c_str(), &out_texture, &out_width, &out_height);
+    assert loaded;
+    // IM_ASSERT(loaded);
 }
 
 void drawSprite(float x, float y, float width, float height, float texCoordX, float texCoordY, float texWidth, float texHeight) {

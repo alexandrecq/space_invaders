@@ -1,10 +1,6 @@
-// #include "space_invaders/scene.h"
 #include "space_invaders/game.h"
-#include "space_invaders/interface.h"
 
-
-
-int main(int, char**)
+int main(int argc, char** argv)
 {
     Game game;
     game.run();
