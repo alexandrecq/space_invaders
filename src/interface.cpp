@@ -1,3 +1,4 @@
+#include <GL/gl.h>
 #include <string>
 
 #include "imgui.h"
@@ -37,6 +38,8 @@ Interface::Interface() {
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(m_window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
+
+    loadTexture();
 }
 
 Interface::~Interface() {
@@ -73,22 +76,30 @@ void Interface::startFrame() const {
     glfwGetFramebufferSize(m_window, &display_w, &display_h);
     glViewport(0, 0, display_w, display_h);
 
-    ImVec4 clear_color = ImVec4(0.15f, 0.05f, 0.20f, 1.00f);
+    ImVec4 clear_color = ImVec4(0.15f, 0.05f, 0.20f, .50f);
+    // ImVec4 clear_color = ImVec4(0.f, 0.f, 0.f, 1.f);
+    glEnable(GL_BLEND);
     glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    GLuint out_texture;
-    int out_width, out_height;
-    const std::string filename("../assets/1ST_FRAME_3.png");
-    bool loaded = LoadTextureFromFile(filename.c_str(), &out_texture, &out_width, &out_height);
-    IM_ASSERT(loaded);
-    drawTexture(0, 0, .1, .1, 0.0, 0.0, 1, 1, out_texture);
+    // drawTexture(0, 0, 1, 1, 0.0, 0.0, 1, 1, m_textureID);
+
+    drawTexture(0, 0, .1, .1, 0., 0., .5, .5, m_textureID);
+    drawTexture(-1, -1, .1, .1, .5, .5, .5, .5, m_textureID);
 
     keyboardEvent();
 }
 
-void Interface::renderFrame() const {
+void Interface::loadTexture() {
+    int out_width, out_height;
+    // const std::string filename("../assets/zeros10x10x3.png");
+    // const std::string filename("../assets/black-white100x3.png");
+    const std::string filename("../assets/1ST_FRAME_3.png");
+    bool loaded = LoadTextureFromFile(filename.c_str(), &m_textureID, &out_width, &out_height);
+    IM_ASSERT(loaded);
+}
 
+void Interface::renderFrame() const {
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     glfwSwapBuffers(m_window);
 }
@@ -102,12 +113,12 @@ void Interface::drawRectangle(
     glVertex2f(bottomLeft.x(), bottomLeft.y() + widthHeight.y());
     glVertex2f(bottomLeft.x() + widthHeight.x(), bottomLeft.y() + widthHeight.y());
     glVertex2f(bottomLeft.x() + widthHeight.x(), bottomLeft.y());
-    // glColor3f(0, 0, 0);
+    glColor3f(1, 1, 1);  // reset color
     glEnd();
 }
 
 void Interface::drawTexture(float x, float y, float width, float height, float texCoordX, float texCoordY, float texWidth, float texHeight, GLuint textureID) const {
-    glClear(GL_COLOR_BUFFER_BIT);
+    // glClear(GL_COLOR_BUFFER_BIT);
     glBindTexture(GL_TEXTURE_2D, textureID);
     glEnable(GL_TEXTURE_2D);
     glBegin(GL_QUADS);
@@ -124,9 +135,6 @@ void Interface::drawTexture(float x, float y, float width, float height, float t
     glEnd();
     glDisable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, 0);
-
-    glBindTexture(GL_TEXTURE_2D, textureID);
-    glBegin(GL_QUADS);
 }
 
 bool Interface::keyboardEvent() const {

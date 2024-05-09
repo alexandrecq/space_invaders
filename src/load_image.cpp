@@ -12,9 +12,19 @@ bool LoadTextureFromFile(const char* filename, GLuint* out_texture, int* out_wid
         return false;
 
     // //Print image data
+    // printf("%d, %d, %d\n", image_width, image_height, num_channels);
     // int values_per_row = image_width * num_channels;
-    // for (int i = 0; i < image_width * image_height * num_channels; i++){
-    //     printf("(%d, %d, %d): %d\n", i / values_per_row, i % values_per_row / num_channels, i % num_channels, *(image_data + i));
+    // unsigned char* data_ptr = image_data;
+    // for (int i = 0; i < image_width; i++){
+    //     for (int j = 0; j < image_height; j++){
+    //         printf("(");
+    //         for (int c = 0; c < num_channels; c++){
+    //             printf("%02d, ", *data_ptr);
+    //             data_ptr++;
+    //         }
+    //         printf(") ");
+    //     }
+    //     printf("\n");
     // }
 
     // Create a OpenGL texture identifier
