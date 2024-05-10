@@ -71,8 +71,8 @@ void Interface::startFrame() const {
     glfwGetFramebufferSize(m_window, &display_w, &display_h);
     glViewport(0, 0, display_w, display_h);
 
-    ImVec4 clear_color = ImVec4(0.15f, 0.05f, 0.20f, .50f);
-    // ImVec4 clear_color = ImVec4(0.f, 0.f, 0.f, 1.f);
+    // ImVec4 clear_color = ImVec4(0.15f, 0.05f, 0.20f, .50f);
+    ImVec4 clear_color = ImVec4(0.f, 0.f, 0.f, 1.f);
     glEnable(GL_BLEND);
     glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -84,18 +84,6 @@ void Interface::startFrame() const {
 
     keyboardEvent();
 }
-
-// void Interface::loadTexture() {
-//     int out_width, out_height;
-//     // const std::string filename("../assets/zeros10x10x3.png");
-//     printf("%d, %d\n", m_textureIDs[0], m_textureIDs[1]);
-//     const std::string filename("../assets/1ST_FRAME_3.png");
-//     bool loaded = LoadTextureFromFile(filename.c_str(), &m_textureIDs[0], &out_width, &out_height);
-//     const std::string filename2("../assets/albert1000x.jpg");
-//     bool loaded2 = LoadTextureFromFile(filename2.c_str(), &m_textureIDs[1], &out_width, &out_height);
-//     printf("%d, %d\n", m_textureIDs[0], m_textureIDs[1]);
-//     IM_ASSERT(loaded);
-// }
 
 void Interface::renderFrame() const {
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -120,7 +108,6 @@ void Interface::drawTexture(
     const float& x, const float& y, const float& width, const float& height,
     const float& texCoordX, const float& texCoordY, const float& texWidth, const float& texHeight
     ) const {
-    // glClear(GL_COLOR_BUFFER_BIT);
     glBindTexture(GL_TEXTURE_2D, textureID);
     glEnable(GL_TEXTURE_2D);
     glBegin(GL_QUADS);
@@ -133,6 +120,29 @@ void Interface::drawTexture(
     glVertex2f(x + width, y + height);
     glTexCoord2f(texCoordX, texCoordY);
     glVertex2f(x, y + height);
+
+    glEnd();
+    glDisable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void Interface::drawTexture(
+    const GLuint textureID,
+    const Eigen::Array2f& bottomLeft, const Eigen::Array2f& widthHeight,
+    const Eigen::Array2f& texBottomLeft, const Eigen::Array2f& texWidthHeight
+    ) const {
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    glEnable(GL_TEXTURE_2D);
+    glBegin(GL_QUADS);
+
+    glTexCoord2f(texBottomLeft.x(), texBottomLeft.y() + texWidthHeight.y());
+    glVertex2f(bottomLeft.x(), bottomLeft.y());
+    glTexCoord2f(texBottomLeft.x() + texWidthHeight.x(), texBottomLeft.y() + texWidthHeight.y());
+    glVertex2f(bottomLeft.x() + widthHeight.x(), bottomLeft.y());
+    glTexCoord2f(texBottomLeft.x() + texWidthHeight.x(), texBottomLeft.y());
+    glVertex2f(bottomLeft.x() + widthHeight.x(), bottomLeft.y() + widthHeight.y());
+    glTexCoord2f(texBottomLeft.x(), texBottomLeft.y());
+    glVertex2f(bottomLeft.x(), bottomLeft.y() + widthHeight.y());
 
     glEnd();
     glDisable(GL_TEXTURE_2D);

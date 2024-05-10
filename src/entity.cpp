@@ -1,5 +1,6 @@
 
 #include "space_invaders/entity.h"
+#include "space_invaders/animation.h"
 #include "space_invaders/interface.h"
 
 
@@ -8,10 +9,17 @@ static const AABB gameAABB({-1, -1}, {1, 1});
 Entity::Entity(Array2f widthHeight, Array2f position, Array3f color) :
     m_position(position), m_widthHeight(widthHeight), m_color(color) {}
 
+Entity::Entity(Array2f widthHeight, Array2f position, Array3f color, Animation animation) :
+    m_position(position), m_widthHeight(widthHeight), m_color(color), m_animation(animation) {}
+
 void Entity::draw(Interface const *interface) const {
     if (!m_active) return;
     auto bottomLeft = m_position - m_widthHeight / 2;
-    interface->drawRectangle(bottomLeft, m_widthHeight, m_color);
+    if (m_animation.isEmpty()) {
+        interface->drawRectangle(bottomLeft, m_widthHeight, m_color);
+    } else {
+        interface->drawTexture(m_animation.getCurrentTexture(), bottomLeft, m_widthHeight);
+    }
 }
 
 AABB Entity::aabb() const {

@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "space_invaders/aabb.h"
+#include "space_invaders/animation.h"
 
 using std::vector;
 using std::shared_ptr;
@@ -13,9 +14,10 @@ class Interface;
 
 class Entity {
 public:
-	Entity() = default;
+	// Entity() = default;
 	// virtual ~Entity() = default;
 	Entity(Array2f widthHeight, Array2f position, Array3f color);
+	Entity(Array2f widthHeight, Array2f position, Array3f color, Animation animation);
 	virtual void update(int ticks) = 0;
 	void draw(Interface const *interface) const;
 	AABB aabb() const;
@@ -26,11 +28,13 @@ public:
 	Array2f getWidthHeight() const { return m_widthHeight; }
 	void setActive(bool active) { m_active = active; }
 	bool isActive() const { return m_active; }
+	void setAnimation(const Animation& animation) { m_animation = animation; }
 
 protected:
 	const Array2f m_widthHeight{.01, .01};
 	Array2f m_position;
 	Array3f m_color;
+	Animation m_animation;
 	bool m_active = true;
 	int m_num_lives = 1;
 private:
@@ -90,6 +94,6 @@ private:
 
 	std::mt19937 m_gen;
 	std::uniform_int_distribution<int> m_distribution;
-	const int m_fireProbability = 100;
+	const int m_fireProbability = 50;
 };
 

@@ -13,4 +13,8 @@ Animation::Animation(const vector<string> texturePaths) {
         m_textureIDs.push_back(textureID);
     }
 }
-                // m_interface.drawTexture(textureID, 0.5, 0.5, .1, .1, 0., 0., 1., 1.);
+
+GLuint Animation::getCurrentTexture() const {
+    if (isEmpty()) return 0;
+    else return m_textureIDs[0];
+}

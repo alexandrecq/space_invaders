@@ -29,7 +29,12 @@ public:
 		const GLuint textureID,
 		const float& x, const float& y, const float& width, const float& height,
 		const float& texCoordX = 0.f, const float& texCoordY = 0.f, const float& texWidth = 1.f, const float& texHeight = 1.f
-	    ) const;
+	) const;
+	void drawTexture(
+		const GLuint textureID,
+		const Eigen::Array2f& bottomLeft, const Eigen::Array2f& widthHeight,
+		const Eigen::Array2f& texBottomLeft = {0., 0.}, const Eigen::Array2f& texWidthHeight = {1., 1.}
+	) const;
 private:
 	// Eigen::Array2i getWindowSize
 	std::shared_ptr<Player> m_player;

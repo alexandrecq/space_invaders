@@ -24,6 +24,5 @@ const vector<string> ALIEN_C_TEXTURE_PATHS{
 };
 
 const vector<string> PLAYER_TEXTURE_PATHS{
-	"alien_c_walk_0.png",
-	"alien_c_walk_1.png",
+	"player.png",
 };
