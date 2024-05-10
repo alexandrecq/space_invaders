@@ -1,6 +1,7 @@
 
 #include "space_invaders/entity.h"
 #include "space_invaders/animation.h"
+#include "space_invaders/constants.h"
 #include "space_invaders/interface.h"
 
 
@@ -66,7 +67,7 @@ EntityThatFires::EntityThatFires(Array2f widthHeight, Array2f position, Array3f 
     const Array2f projectileWidthHeight{.01, .05};
     const Array2f projectilePosition{0, 0};
     const Array3f projectileColor{1., 1., 1.};
-    const float vertStepSize((firesUp ? +1 : -1) * .01);
+    const float vertStepSize((firesUp ? +1 : -1) * .02);
     m_projectile = std::make_shared<Projectile>(projectileWidthHeight, projectilePosition, projectileColor, vertStepSize);
     m_projectile->setActive(false);
 }
@@ -81,7 +82,7 @@ void EntityThatFires::fire() {
 
 Player::Player(Array2f widthHeight, Array2f position, Array3f color) :
     EntityThatFires(widthHeight, position, color, true) {
-    m_num_lives = 3;
+    m_num_lives = PLAYER_NUM_LIVES;
 }
 
 void Player::update(int ticks)  {
@@ -96,16 +97,15 @@ void Player::takeStep(bool toTheRight) {
 
 
 Alien::Alien(Array2f widthHeight,Array2f position, Array3f color,
-             Array2f stepSize, int numStepsTilReverse) :
+             int numStepsTilReverse) :
     EntityThatFires(widthHeight, position, color, false),
-    m_stepSize(stepSize), m_numStepsTilReverse(numStepsTilReverse)
+    m_numStepsTilReverse(numStepsTilReverse)
 {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<int> dist(1, 100000);
     m_gen = gen;
     m_distribution = dist;
-
 }
 
 void Alien::update(int ticks)  {
@@ -124,6 +124,7 @@ void Alien::update(int ticks)  {
             m_position.x() += m_stepSize.x();
             m_stepsTaken += 1;
         }
+        m_animation.incrementTexture();
         m_lastStepTick = ticks;
     }
 }

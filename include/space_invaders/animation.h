@@ -13,8 +13,10 @@ class Animation {
 public:
 	Animation() = default;
 	Animation(const vector<string> texturePaths);
+	void incrementTexture();
 	GLuint getCurrentTexture() const;
 	bool isEmpty() const { return m_textureIDs.empty(); }
 private:
 	vector<GLuint> m_textureIDs;
+	int m_currentIndex{};
 };

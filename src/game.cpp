@@ -19,12 +19,9 @@ Game::Game() {
 }
 
 void Game::initPlayer() {
-    const Array2f playerWidthHeight{.2, .1};
-    const Array2f playerStartPosition{0, -1 + playerWidthHeight.y() / 2};
-    const Array3f playerColor{0., .1, 1.};
     const Animation playerAnimation(PLAYER_TEXTURE_PATHS);
 
-    m_player = std::make_shared<Player>(playerWidthHeight, playerStartPosition, playerColor);
+    m_player = std::make_shared<Player>(PLAYER_WIDTH_HEIGHT, PLAYER_START_POSITION, PLAYER_COLOR);
     m_player->setAnimation(playerAnimation);
     m_entities.push_back(m_player);
     m_interface.setPlayer(m_player);
@@ -33,33 +30,33 @@ void Game::initPlayer() {
 }
 
 void Game::initAlienGrid(const int numRows, const int numCols) {
-    const Array2f alienWidthHeight{.1, .1};
-    const Array3f alienColor = {.5, 0, .5};
-    const Array2f gridIncXY = 1.5 * alienWidthHeight;
-    const Array2f stepSize = {alienWidthHeight.x() / 2, -alienWidthHeight.y() / 2};
-    Animation alienAnimation(ALIEN_A_TEXTURE_PATHS);
+    const Array2f gridIncXY = 1.5 * ALIEN_WIDTH_HEIGHT;
+    const Array2f stepSize = {ALIEN_WIDTH_HEIGHT.x() / 2, -ALIEN_WIDTH_HEIGHT.y() / 2};
+    const Animation alienAnimationA(ALIEN_A_TEXTURE_PATHS);
+    const Animation alienAnimationB(ALIEN_B_TEXTURE_PATHS);
+    const Animation alienAnimationC(ALIEN_C_TEXTURE_PATHS);
 
     const Array2f colsRows{numCols, numRows};
-    const Array2f gridOuterDims = (colsRows * alienWidthHeight)
-        + (colsRows - 1.f) * (gridIncXY - alienWidthHeight);
+    const Array2f gridOuterDims = (colsRows * ALIEN_WIDTH_HEIGHT)
+        + (colsRows - 1.f) * (gridIncXY - ALIEN_WIDTH_HEIGHT);
     const float extraSpaceX = 2 - gridOuterDims.x();
     const int numStepsTilReverse = extraSpaceX / stepSize.x();
     const Array2f gridBottomLeft{-1, 1 - gridOuterDims.y()};
 
+    Animation rowAnimation = alienAnimationA;
     for (int y = 0; y < numRows; y++) {
-        if (y > 0 && y < 4) alienAnimation = Animation(ALIEN_B_TEXTURE_PATHS);
-        else if (y == 4) alienAnimation = Animation(ALIEN_C_TEXTURE_PATHS);
+        if (y > 1 && y < 4) rowAnimation = alienAnimationB;
+        else if (y == 4) rowAnimation = alienAnimationC;
         for (int x = 0; x < numCols; x++) {
             Array2f alienBottomLeft = gridBottomLeft + Array2f{x * gridIncXY.x(), y * gridIncXY.y()};
-            Array2f alienPosition = alienBottomLeft + alienWidthHeight / 2;
+            Array2f alienPosition = alienBottomLeft + ALIEN_WIDTH_HEIGHT / 2;
             auto alien = std::make_shared<Alien>(
-                alienWidthHeight,
+                ALIEN_WIDTH_HEIGHT,
                 alienPosition,
-                alienColor,
-                stepSize,
+                ALIEN_COLOR,
                 numStepsTilReverse
             );
-            alien->setAnimation(alienAnimation);
+            alien->setAnimation(rowAnimation);
             m_entities.push_back(alien);
             m_entities.push_back(alien->getProjectile());
             m_aliens.push_back(alien);

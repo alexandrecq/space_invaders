@@ -2,6 +2,7 @@
 
 #include <chrono>
 
+#include "space_invaders/constants.h"
 #include "space_invaders/entity.h"
 #include "space_invaders/interface.h"
 
@@ -11,8 +12,8 @@ public:
 	Game();
 	void run();
 	void initPlayer();
-	void initAlienGrid(const int num_rows = 5, const int num_cols = 10);
-	void initBarriers(const int numBarriers = 4);
+	void initAlienGrid(const int num_rows = GAME_NUM_ALIEN_ROWS, const int num_cols = GAME_NUM_ALIEN_COLS);
+	void initBarriers(const int numBarriers = GAME_NUM_BARRIERS);
 	void setPlayerTargets();
 	void setAlienTargets();
 private:
@@ -26,5 +27,5 @@ private:
 	vector<shared_ptr<Entity>> m_barriers;
 
 	std::chrono::time_point<std::chrono::steady_clock> m_start_time;
-	const long long m_tick_ms = 10;
+	const long long m_tick_ms = GAME_TICK_MS;
 };
