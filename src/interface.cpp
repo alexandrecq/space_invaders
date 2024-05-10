@@ -77,11 +77,6 @@ void Interface::startFrame() const {
     glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    // drawTexture(0, 0, 1, 1, 0.0, 0.0, 1, 1, m_textureID);
-
-    // drawTexture(0, 0, .1, .1, 0., 0., .5, .5, m_textureIDs[0]);
-    // drawTexture(-1, -1, .1, .1, .5, .5, .5, .5, m_textureIDs[1]);
-
     keyboardEvent();
 }
 

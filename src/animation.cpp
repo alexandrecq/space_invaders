@@ -11,6 +11,7 @@ Animation::Animation(const vector<string> texturePaths) {
         bool loaded = LoadTextureFromFile((RELATIVE_PATH + path).c_str(), &textureID);
         assert(loaded);
         m_textureIDs.push_back(textureID);
+        printf("loaded %d\n", textureID);
     }
 }
 
