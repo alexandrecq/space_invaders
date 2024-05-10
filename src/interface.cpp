@@ -1,6 +1,3 @@
-#include <GL/gl.h>
-#include <string>
-
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -38,8 +35,6 @@ Interface::Interface() {
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(m_window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
-
-    loadTexture();
 }
 
 Interface::~Interface() {
@@ -84,20 +79,23 @@ void Interface::startFrame() const {
 
     // drawTexture(0, 0, 1, 1, 0.0, 0.0, 1, 1, m_textureID);
 
-    drawTexture(0, 0, .1, .1, 0., 0., .5, .5, m_textureID);
-    drawTexture(-1, -1, .1, .1, .5, .5, .5, .5, m_textureID);
+    // drawTexture(0, 0, .1, .1, 0., 0., .5, .5, m_textureIDs[0]);
+    // drawTexture(-1, -1, .1, .1, .5, .5, .5, .5, m_textureIDs[1]);
 
     keyboardEvent();
 }
 
-void Interface::loadTexture() {
-    int out_width, out_height;
-    // const std::string filename("../assets/zeros10x10x3.png");
-    // const std::string filename("../assets/black-white100x3.png");
-    const std::string filename("../assets/1ST_FRAME_3.png");
-    bool loaded = LoadTextureFromFile(filename.c_str(), &m_textureID, &out_width, &out_height);
-    IM_ASSERT(loaded);
-}
+// void Interface::loadTexture() {
+//     int out_width, out_height;
+//     // const std::string filename("../assets/zeros10x10x3.png");
+//     printf("%d, %d\n", m_textureIDs[0], m_textureIDs[1]);
+//     const std::string filename("../assets/1ST_FRAME_3.png");
+//     bool loaded = LoadTextureFromFile(filename.c_str(), &m_textureIDs[0], &out_width, &out_height);
+//     const std::string filename2("../assets/albert1000x.jpg");
+//     bool loaded2 = LoadTextureFromFile(filename2.c_str(), &m_textureIDs[1], &out_width, &out_height);
+//     printf("%d, %d\n", m_textureIDs[0], m_textureIDs[1]);
+//     IM_ASSERT(loaded);
+// }
 
 void Interface::renderFrame() const {
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -117,7 +115,11 @@ void Interface::drawRectangle(
     glEnd();
 }
 
-void Interface::drawTexture(float x, float y, float width, float height, float texCoordX, float texCoordY, float texWidth, float texHeight, GLuint textureID) const {
+void Interface::drawTexture(
+    const GLuint textureID,
+    const float& x, const float& y, const float& width, const float& height,
+    const float& texCoordX, const float& texCoordY, const float& texWidth, const float& texHeight
+    ) const {
     // glClear(GL_COLOR_BUFFER_BIT);
     glBindTexture(GL_TEXTURE_2D, textureID);
     glEnable(GL_TEXTURE_2D);

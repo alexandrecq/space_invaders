@@ -1,5 +1,7 @@
-#include "space_invaders/game.h"
+#include "space_invaders/animation.h"
+#include "space_invaders/constants.h"
 #include "space_invaders/entity.h"
+#include "space_invaders/game.h"
 
 #include <iterator>
 #include <thread>
@@ -22,6 +24,7 @@ void Game::initPlayer() {
     const Array2f playerStartPosition{0, -1 + playerWidthHeight.y() / 2};
     const Array3f playerColor{0., .1, 1.};
 
+    Animation playerAnimation(PLAYER_TEXTURE_PATHS);
     m_player = std::make_shared<Player>(playerWidthHeight, playerStartPosition, playerColor);
     m_entities.push_back(m_player);
     m_interface.setPlayer(m_player);
@@ -101,6 +104,8 @@ void Game::run() {
             if (entity) {
                 entity->update(elapsed_ms.count());
                 entity->draw(&m_interface);
+
+
             }
         }
         m_interface.renderFrame();

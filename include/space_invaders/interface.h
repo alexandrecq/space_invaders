@@ -15,8 +15,6 @@ static void glfw_error_callback(int error, const char* description)
     fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }
 
-bool LoadTextureFromFile(const char* filename, GLuint* out_texture, int* out_width, int* out_height);
-
 class Interface {
 public:
 	Interface();
@@ -27,12 +25,14 @@ public:
 	void drawRectangle(Eigen::Array2f bottomLeft, Eigen::Array2f widthHeight, Eigen::Array3f color = {1., 1., 1.}) const;
 	bool keyboardEvent() const;
 	void setPlayer(std::shared_ptr<Player> player);
-	void loadTexture();
-	void drawTexture(float x, float y, float width, float height,
-		  float texCoordX, float texCoordY, float texWidth, float texHeight, GLuint textureID) const;
+	void drawTexture(
+		const GLuint textureID,
+		const float& x, const float& y, const float& width, const float& height,
+		const float& texCoordX = 0.f, const float& texCoordY = 0.f, const float& texWidth = 1.f, const float& texHeight = 1.f
+	    ) const;
 private:
 	// Eigen::Array2i getWindowSize
 	std::shared_ptr<Player> m_player;
 	GLFWwindow* m_window = nullptr;
-	GLuint m_textureID;
+	vector<GLuint> m_textureIDs{2};
 };
