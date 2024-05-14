@@ -29,16 +29,23 @@ public:
 	Array2f getWidthHeight() const { return m_widthHeight; }
 	void setActive(bool active) { m_active = active; }
 	bool isActive() const { return m_active; }
-	void setAnimation(const Animation& animation) { m_animation = animation; }
-
+	void setDrawMe(bool drawMe) { m_drawMe = drawMe; }
+	void setDefaultAnimation(const Animation& animation) {
+		m_defaultAnimation = animation;
+		m_currentAnimation = m_defaultAnimation;
+	}
+	void setDeathAnimation(const Animation& animation) { m_deathAnimation = animation; }
+	void updateCurrentAnimation(int ticks);
 protected:
 	const Array2f m_widthHeight{.01, .01};
 	Array2f m_position;
 	Array3f m_color;
-	Animation m_animation;
+	Animation m_defaultAnimation;
+	Animation m_deathAnimation;
+	Animation m_currentAnimation;
 	bool m_active = true;
-	int m_num_lives = 1;
-private:
+	bool m_drawMe = true;
+	int m_numLives = 1;
 };
 
 

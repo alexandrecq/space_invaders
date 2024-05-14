@@ -12,7 +12,7 @@ public:
 	Game();
 	void run();
 	void initPlayer();
-	void initAlienGrid(const int num_rows = GAME_NUM_ALIEN_ROWS, const int num_cols = GAME_NUM_ALIEN_COLS);
+	void initAlienGrid(const int numRows = GAME_NUM_ALIEN_ROWS, const int numCols = GAME_NUM_ALIEN_COLS);
 	void initBarriers(const int numBarriers = GAME_NUM_BARRIERS);
 	void setPlayerTargets();
 	void setAlienTargets();

@@ -19,10 +19,10 @@ Game::Game() {
 }
 
 void Game::initPlayer() {
-    const Animation playerAnimation(PLAYER_TEXTURE_PATHS);
+    const Animation playerAnimation(PLAYER_DEFAULT_TEXTURE_PATHS);
 
     m_player = std::make_shared<Player>(PLAYER_WIDTH_HEIGHT, PLAYER_START_POSITION, PLAYER_COLOR);
-    m_player->setAnimation(playerAnimation);
+    m_player->setDefaultAnimation(playerAnimation);
     m_entities.push_back(m_player);
     m_interface.setPlayer(m_player);
 
@@ -32,9 +32,12 @@ void Game::initPlayer() {
 void Game::initAlienGrid(const int numRows, const int numCols) {
     const Array2f gridIncXY = 1.5 * ALIEN_WIDTH_HEIGHT;
     const Array2f stepSize = {ALIEN_WIDTH_HEIGHT.x() / 2, -ALIEN_WIDTH_HEIGHT.y() / 2};
-    const Animation alienAnimationA(ALIEN_A_TEXTURE_PATHS);
-    const Animation alienAnimationB(ALIEN_B_TEXTURE_PATHS);
-    const Animation alienAnimationC(ALIEN_C_TEXTURE_PATHS);
+    const Animation alienDefaultAnimationA(ALIEN_A_DEFAULT_TEXTURE_PATHS, ALIEN_STEP_EVERY_TICKS);
+    const Animation alienDefaultAnimationB(ALIEN_B_DEFAULT_TEXTURE_PATHS, ALIEN_STEP_EVERY_TICKS);
+    const Animation alienDefaultAnimationC(ALIEN_C_DEFAULT_TEXTURE_PATHS, ALIEN_STEP_EVERY_TICKS);
+    const Animation alienDeathAnimationA(ALIEN_A_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS, false);
+    const Animation alienDeathAnimationB(ALIEN_B_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS, false);
+    const Animation alienDeathAnimationC(ALIEN_C_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS, false);
 
     const Array2f colsRows{numCols, numRows};
     const Array2f gridOuterDims = (colsRows * ALIEN_WIDTH_HEIGHT)
@@ -43,10 +46,16 @@ void Game::initAlienGrid(const int numRows, const int numCols) {
     const int numStepsTilReverse = extraSpaceX / stepSize.x();
     const Array2f gridBottomLeft{-1, 1 - gridOuterDims.y()};
 
-    Animation rowAnimation = alienAnimationA;
+    Animation rowDefaultAnimation = alienDefaultAnimationA;
+    Animation rowDeathAnimation = alienDeathAnimationA;
     for (int y = 0; y < numRows; y++) {
-        if (y > 1 && y < 4) rowAnimation = alienAnimationB;
-        else if (y == 4) rowAnimation = alienAnimationC;
+        if (y > 1 && y < 4) {
+            rowDefaultAnimation = alienDefaultAnimationB;
+            rowDeathAnimation = alienDeathAnimationB;
+        } else if (y == 4) {
+            rowDefaultAnimation = alienDefaultAnimationC;
+            rowDeathAnimation = alienDeathAnimationC;
+        }
         for (int x = 0; x < numCols; x++) {
             Array2f alienBottomLeft = gridBottomLeft + Array2f{x * gridIncXY.x(), y * gridIncXY.y()};
             Array2f alienPosition = alienBottomLeft + ALIEN_WIDTH_HEIGHT / 2;
@@ -56,7 +65,9 @@ void Game::initAlienGrid(const int numRows, const int numCols) {
                 ALIEN_COLOR,
                 numStepsTilReverse
             );
-            alien->setAnimation(rowAnimation);
+
+            alien->setDefaultAnimation(rowDefaultAnimation);
+            alien->setDeathAnimation(rowDeathAnimation);
             m_entities.push_back(alien);
             m_entities.push_back(alien->getProjectile());
             m_aliens.push_back(alien);

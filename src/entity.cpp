@@ -11,15 +11,16 @@ Entity::Entity(Array2f widthHeight, Array2f position, Array3f color) :
     m_position(position), m_widthHeight(widthHeight), m_color(color) {}
 
 Entity::Entity(Array2f widthHeight, Array2f position, Array3f color, Animation animation) :
-    m_position(position), m_widthHeight(widthHeight), m_color(color), m_animation(animation) {}
+    m_position(position), m_widthHeight(widthHeight), m_color(color), m_defaultAnimation(animation) {}
 
 void Entity::draw(Interface const *interface) const {
-    if (!m_active) return;
+    if (!m_drawMe) return;
     auto bottomLeft = m_position - m_widthHeight / 2;
-    if (m_animation.isEmpty()) {
+
+    if (m_currentAnimation.isEmpty()) {
         interface->drawRectangle(bottomLeft, m_widthHeight, m_color);
     } else {
-        interface->drawTexture(m_animation.getCurrentTexture(), bottomLeft, m_widthHeight);
+        interface->drawTexture(m_currentAnimation.getCurrentTexture(), bottomLeft, m_widthHeight);
     }
 }
 
@@ -28,21 +29,36 @@ AABB Entity::aabb() const {
 }
 
 void Entity::hit() {
-    m_num_lives--;
-    if (m_num_lives == 0) m_active = false;
+    m_numLives--;
+    m_deathAnimation.reset();
+    m_currentAnimation = m_deathAnimation;
+    if (m_numLives == 0) {
+        m_active = false;
+    }
+}
+
+void Entity::updateCurrentAnimation(int ticks) {
+    m_currentAnimation.updateTexture(ticks);
+    if (m_currentAnimation.isDone()) {
+        m_drawMe = false;
+        m_currentAnimation = m_defaultAnimation;
+    }
 }
 
 
 Barrier::Barrier(Array2f widthHeight, Array2f position, Array3f color) :
     Entity(widthHeight, position, color) {
-    m_num_lives = 5;
+    m_numLives = BARRIER_NUM_LIVES;
 }
 
 void Barrier::update(int ticks)  {}
 
 
 Projectile::Projectile(Array2f widthHeight, Array2f position, Array3f color, float vertStepSize) :
-    Entity(widthHeight, position, color), m_vertStepSize(vertStepSize) {}
+    Entity(widthHeight, position, color), m_vertStepSize(vertStepSize) {
+    m_active = false;
+    m_drawMe = false;
+}
 
 void Projectile::update(int ticks)  {
     if (!m_active) return;
@@ -52,12 +68,16 @@ void Projectile::update(int ticks)  {
             if (!target->isActive()) continue;
             if (aabb().intersects(target->aabb())) {
                 m_active = false;
+                m_drawMe = false;
                 target->hit();
             }
         }
     }
     m_position.y() += m_vertStepSize;
-    if (!aabb().intersects(gameAABB)) m_active = false;
+    if (!aabb().intersects(gameAABB)) {
+        m_active = false;
+        m_drawMe = false;
+    }
 }
 
 
@@ -69,12 +89,12 @@ EntityThatFires::EntityThatFires(Array2f widthHeight, Array2f position, Array3f 
     const Array3f projectileColor{1., 1., 1.};
     const float vertStepSize((firesUp ? +1 : -1) * .02);
     m_projectile = std::make_shared<Projectile>(projectileWidthHeight, projectilePosition, projectileColor, vertStepSize);
-    m_projectile->setActive(false);
 }
 
 void EntityThatFires::fire() {
     if (!m_active || m_projectile->isActive()) return;
     m_projectile->setActive(true);
+    m_projectile->setDrawMe(true);
     float offset = m_widthHeight.y() / 2 + m_projectile->getWidthHeight().y() / 2;
     m_projectile->setPosition({m_position.x(), m_position.y() + (m_firesUp ? +offset : -offset)});
 }
@@ -82,7 +102,7 @@ void EntityThatFires::fire() {
 
 Player::Player(Array2f widthHeight, Array2f position, Array3f color) :
     EntityThatFires(widthHeight, position, color, true) {
-    m_num_lives = PLAYER_NUM_LIVES;
+    m_numLives = PLAYER_NUM_LIVES;
 }
 
 void Player::update(int ticks)  {
@@ -90,6 +110,7 @@ void Player::update(int ticks)  {
 }
 
 void Player::takeStep(bool toTheRight) {
+    if (!m_active) return;
     m_position.x() += toTheRight ? +.1 : -.1;
     m_position.x() = fmin(m_position.x(),  1 - m_widthHeight.x() / 2);
     m_position.x() = fmax(m_position.x(), -1 + m_widthHeight.x() / 2);
@@ -109,7 +130,9 @@ Alien::Alien(Array2f widthHeight,Array2f position, Array3f color,
 }
 
 void Alien::update(int ticks)  {
+    updateCurrentAnimation(ticks);
     if (!m_active) return;
+
     const int randomNumber = m_distribution(m_gen);
     if (randomNumber <= m_fireProbability) {
         fire();
@@ -124,7 +147,6 @@ void Alien::update(int ticks)  {
             m_position.x() += m_stepSize.x();
             m_stepsTaken += 1;
         }
-        m_animation.incrementTexture();
         m_lastStepTick = ticks;
     }
 }
