@@ -5,14 +5,26 @@
 #include "space_invaders/load_image.h"
 
 
+std::unordered_set<string> Animation::m_loadedTextures;
+
 Animation::Animation(const vector<string> texturePaths, int updateEveryTicks, bool isLoop) :
     m_updateEveryTicks(updateEveryTicks), m_isLoop(isLoop) {
     for (auto& path : texturePaths) {
+        checkSingleTextureLoad(path);
         GLuint textureID;
         bool loaded = LoadTextureFromFile((RELATIVE_TEXTURE_PATH + path).c_str(), &textureID);
         assert(loaded);
         m_textureIDs.push_back(textureID);
     }
+}
+
+void Animation::checkSingleTextureLoad(const string texturePath) {
+    bool found = (m_loadedTextures.find(texturePath) != m_loadedTextures.end());
+    if (found) {
+        printf("texture %s is already loaded\n", texturePath.c_str());
+        assert(false);
+    }
+    m_loadedTextures.insert(texturePath);
 }
 
 void Animation::updateTexture(int ticks) {

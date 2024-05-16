@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 #include <GL/gl.h>
@@ -20,10 +21,12 @@ public:
 	bool isDone() const;
 private:
 	void incrementTexture();
+	void checkSingleTextureLoad(const string texturePath);
 
 	vector<GLuint> m_textureIDs;
 	int m_currentIndex{};
 	bool m_isLoop;
 	int m_updateEveryTicks;
 	int m_lastUpdateTick = 0;
+	static std::unordered_set<string> m_loadedTextures;
 };

@@ -1,7 +1,5 @@
 
 #include "space_invaders/entity.h"
-#include "space_invaders/animation.h"
-#include "space_invaders/constants.h"
 #include "space_invaders/interface.h"
 
 
