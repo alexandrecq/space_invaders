@@ -8,17 +8,17 @@ static const AABB gameAABB({-1, -1}, {1, 1});
 Entity::Entity(Array2f widthHeight, Array2f position, Array3f color) :
     m_position(position), m_widthHeight(widthHeight), m_color(color) {}
 
-Entity::Entity(Array2f widthHeight, Array2f position, Array3f color, Animation animation) :
-    m_position(position), m_widthHeight(widthHeight), m_color(color), m_defaultAnimation(animation) {}
+Entity::Entity(Array2f widthHeight, Array2f position, Array3f color, entityAnimations animations) :
+    m_position(position), m_widthHeight(widthHeight), m_color(color), m_animations(animations) {}
 
 void Entity::draw(Interface const *interface) const {
     if (!m_drawMe) return;
     auto bottomLeft = m_position - m_widthHeight / 2;
 
-    if (m_currentAnimation.isEmpty()) {
+    if (m_animations[m_currentAnimation].isEmpty()) {
         interface->drawRectangle(bottomLeft, m_widthHeight, m_color);
     } else {
-        interface->drawTexture(m_currentAnimation.getCurrentTexture(), bottomLeft, m_widthHeight);
+        interface->drawTexture(m_animations[m_currentAnimation].getCurrentTexture(), bottomLeft, m_widthHeight);
     }
 }
 
@@ -27,21 +27,22 @@ AABB Entity::aabb() const {
 }
 
 void Entity::hit() {
+    if (!m_active) return;  // can't be hit while dying or dead
     m_numLives--;
-    m_deathAnimation.reset();
-    m_currentAnimation = m_deathAnimation;
-    if (m_numLives == 0) {
-        m_active = false;
-    }
+    m_animations[ENTITY_DEATH_ANIMATION].reset();
+    m_currentAnimation = ENTITY_DEATH_ANIMATION;
+    m_active = false;
 }
 
 void Entity::updateCurrentAnimation(int ticks) {
-    m_currentAnimation.updateTexture(ticks);
-    if (m_currentAnimation.isDone()) {
-        m_drawMe = false;
-        m_currentAnimation = m_defaultAnimation;
+    m_animations[m_currentAnimation].updateTexture(ticks);
+    if (m_animations[m_currentAnimation].isDone()) {
+        if (m_numLives == 0) m_drawMe = false;
+        else reset();
     }
 }
+
+void Entity::reset() {}
 
 
 Barrier::Barrier(Array2f widthHeight, Array2f position, Array3f color) :
@@ -79,8 +80,8 @@ void Projectile::update(int ticks)  {
 }
 
 
-EntityThatFires::EntityThatFires(Array2f widthHeight, Array2f position, Array3f color, bool firesUp) :
-    Entity(widthHeight, position, color), m_firesUp(firesUp) {
+EntityThatFires::EntityThatFires(Array2f widthHeight, Array2f position, Array3f color, entityAnimations animations, bool firesUp) :
+    Entity(widthHeight, position, color, animations), m_firesUp(firesUp) {
     //set default values for projectile
     const Array2f projectileWidthHeight{.01, .05};
     const Array2f projectilePosition{0, 0};
@@ -98,12 +99,13 @@ void EntityThatFires::fire() {
 }
 
 
-Player::Player(Array2f widthHeight, Array2f position, Array3f color) :
-    EntityThatFires(widthHeight, position, color, true) {
+Player::Player(Array2f widthHeight, Array2f position, Array3f color, entityAnimations animations) :
+    EntityThatFires(widthHeight, position, color, animations, true) {
     m_numLives = PLAYER_NUM_LIVES;
 }
 
 void Player::update(int ticks)  {
+    updateCurrentAnimation(ticks);
     if (!m_active) return;
 }
 
@@ -114,10 +116,24 @@ void Player::takeStep(bool toTheRight) {
     m_position.x() = fmax(m_position.x(), -1 + m_widthHeight.x() / 2);
 }
 
+void Player::hit() {
+    if (!m_active) return;
+    m_numLives--;
+    m_animations[ENTITY_DEATH_ANIMATION].reset();
+    m_currentAnimation = ENTITY_DEATH_ANIMATION;
+    m_active = false;
+}
 
-Alien::Alien(Array2f widthHeight,Array2f position, Array3f color,
+void Player::reset() {
+    m_currentAnimation = ENTITY_DEFAULT_ANIMATION;
+    m_position = PLAYER_START_POSITION;
+    m_active = true;
+}
+
+
+Alien::Alien(Array2f widthHeight,Array2f position, Array3f color, entityAnimations animations,
              int numStepsTilReverse) :
-    EntityThatFires(widthHeight, position, color, false),
+    EntityThatFires(widthHeight, position, color, animations, false),
     m_numStepsTilReverse(numStepsTilReverse)
 {
     std::random_device rd;

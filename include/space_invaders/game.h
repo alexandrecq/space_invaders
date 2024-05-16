@@ -5,8 +5,6 @@
 #include "space_invaders/entity.h"
 #include "space_invaders/interface.h"
 
-using entityAnimations = std::pair<Animation, Animation>;
-
 
 class Game {
 public:

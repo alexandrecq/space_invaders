@@ -11,6 +11,7 @@ const vector<string> ALIEN_A_DEATH_TEXTURE_PATHS = generateTexturePaths("alien_a
 const vector<string> ALIEN_B_DEATH_TEXTURE_PATHS = generateTexturePaths("alien_b_death_", 9);
 const vector<string> ALIEN_C_DEATH_TEXTURE_PATHS = generateTexturePaths("alien_c_death_", 9);
 const vector<string> PLAYER_DEFAULT_TEXTURE_PATHS{ "player.png" };
+const vector<string> PLAYER_DEATH_TEXTURE_PATHS = generateTexturePaths("player_death_", 6);
 
 //Game
 static const int GAME_TICK_MS = 1;
@@ -19,11 +20,15 @@ static const int GAME_NUM_ALIEN_COLS = 10;
 static const int GAME_NUM_BARRIERS = 4;
 static const int GAME_DEATH_ANIMATION_TICKS = 50;
 
+//Entity
+static const int ENTITY_DEFAULT_ANIMATION = 0;
+static const int ENTITY_DEATH_ANIMATION = 1;
+
 // Player
 static const Array2f PLAYER_WIDTH_HEIGHT = {.2, .1};
 static const Array2f PLAYER_START_POSITION = {0, -1 + PLAYER_WIDTH_HEIGHT.y() / 2};
 static const Array3f PLAYER_COLOR = {0., .1, 1.};
-static const int PLAYER_NUM_LIVES = 100;
+static const int PLAYER_NUM_LIVES = 5;
 
 // Alien
 static const Array2f ALIEN_WIDTH_HEIGHT = {.1, .1};

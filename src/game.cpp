@@ -1,9 +1,6 @@
-#include "space_invaders/animation.h"
-#include "space_invaders/constants.h"
 #include "space_invaders/entity.h"
 #include "space_invaders/game.h"
 
-#include <iterator>
 #include <thread>
 
 
@@ -12,7 +9,7 @@ Game::Game() {
 
     initPlayer();
     initAlienGrid();
-    initBarriers();
+    // initBarriers();
 
     setPlayerTargets();
     setAlienTargets();
@@ -22,8 +19,7 @@ Game::Game() {
 void Game::initPlayer() {
     entityAnimations playerAnimations = loadPlayerAnimations();
 
-    m_player = std::make_shared<Player>(PLAYER_WIDTH_HEIGHT, PLAYER_START_POSITION, PLAYER_COLOR);
-    m_player->setDefaultAnimation(playerAnimations.first);
+    m_player = std::make_shared<Player>(PLAYER_WIDTH_HEIGHT, PLAYER_START_POSITION, PLAYER_COLOR, playerAnimations);
     m_entities.push_back(m_player);
     m_interface.setPlayer(m_player);
 
@@ -56,11 +52,9 @@ void Game::initAlienGrid(const int numRows, const int numCols) {
                 ALIEN_WIDTH_HEIGHT,
                 alienPosition,
                 ALIEN_COLOR,
+                rowAnimation,
                 numStepsTilReverse
             );
-
-            alien->setDefaultAnimation(rowAnimation.first);
-            alien->setDeathAnimation(rowAnimation.second);
             m_entities.push_back(alien);
             m_entities.push_back(alien->getProjectile());
             m_aliens.push_back(alien);
@@ -118,8 +112,9 @@ void Game::run() {
 }
 
 entityAnimations Game::loadPlayerAnimations() {
-    const Animation playerAnimation(PLAYER_DEFAULT_TEXTURE_PATHS);
-    return std::make_pair(playerAnimation, Animation());
+    const Animation playerDefaultAnimation(PLAYER_DEFAULT_TEXTURE_PATHS);
+    const Animation playerDeathAnimation(PLAYER_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS, false);
+    return {playerDefaultAnimation, playerDeathAnimation};
 }
 
 std::tuple<entityAnimations, entityAnimations, entityAnimations> Game::loadAlienAnimations() {
@@ -130,8 +125,8 @@ std::tuple<entityAnimations, entityAnimations, entityAnimations> Game::loadAlien
     const Animation alienDeathAnimationB(ALIEN_B_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS, false);
     const Animation alienDeathAnimationC(ALIEN_C_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS, false);
     return {
-        std::make_pair(alienDefaultAnimationA, alienDeathAnimationA),
-        std::make_pair(alienDefaultAnimationB, alienDeathAnimationB),
-        std::make_pair(alienDefaultAnimationC, alienDeathAnimationC)
+        {alienDefaultAnimationA, alienDeathAnimationA},
+        {alienDefaultAnimationB, alienDeathAnimationB},
+        {alienDefaultAnimationC, alienDeathAnimationC},
     };
 }

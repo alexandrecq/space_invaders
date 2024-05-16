@@ -3,6 +3,7 @@
 #include <random>
 #include <memory>
 #include <vector>
+#include <array>
 
 #include "space_invaders/aabb.h"
 #include "space_invaders/animation.h"
@@ -10,6 +11,7 @@
 
 using std::vector;
 using std::shared_ptr;
+using entityAnimations = std::array<Animation, 2>;
 
 class Interface;
 
@@ -18,11 +20,11 @@ public:
 	// Entity() = default;
 	// virtual ~Entity() = default;
 	Entity(Array2f widthHeight, Array2f position, Array3f color);
-	Entity(Array2f widthHeight, Array2f position, Array3f color, Animation animation);
+	Entity(Array2f widthHeight, Array2f position, Array3f color, entityAnimations animations);
 	virtual void update(int ticks) = 0;
 	void draw(Interface const *interface) const;
 	AABB aabb() const;
-	void hit();
+	virtual void hit();
 
 	void setPosition(Array2f position) { m_position = position; }
 	Array2f getPosition() const { return m_position; }
@@ -30,19 +32,15 @@ public:
 	void setActive(bool active) { m_active = active; }
 	bool isActive() const { return m_active; }
 	void setDrawMe(bool drawMe) { m_drawMe = drawMe; }
-	void setDefaultAnimation(const Animation& animation) {
-		m_defaultAnimation = animation;
-		m_currentAnimation = m_defaultAnimation;
-	}
-	void setDeathAnimation(const Animation& animation) { m_deathAnimation = animation; }
 	void updateCurrentAnimation(int ticks);
 protected:
+	virtual void reset();
+
 	const Array2f m_widthHeight{.01, .01};
 	Array2f m_position;
 	Array3f m_color;
-	Animation m_defaultAnimation;
-	Animation m_deathAnimation;
-	Animation m_currentAnimation;
+	entityAnimations m_animations;
+	int m_currentAnimation = ENTITY_DEFAULT_ANIMATION;
 	bool m_active = true;
 	bool m_drawMe = true;
 	int m_numLives = 1;
@@ -69,7 +67,7 @@ private:
 
 class EntityThatFires : public Entity {
 public:
-	EntityThatFires(Array2f widthHeight, Array2f position, Array3f color, bool firesUp);
+	EntityThatFires(Array2f widthHeight, Array2f position, Array3f color, entityAnimations animations, bool firesUp);
 	shared_ptr<Projectile> getProjectile() { return m_projectile; }
 	void setProjectileTargets(vector<shared_ptr<Entity>> targets) { m_projectile->setTargets(targets); }
 	void fire();
@@ -81,15 +79,17 @@ protected:
 
 class Player : public EntityThatFires {
 public:
-	Player(Array2f widthHeight, Array2f position, Array3f color);
+	Player(Array2f widthHeight, Array2f position, Array3f color, entityAnimations animations);
 	void update(int ticks) override;
+	void hit() override;
 	void takeStep(bool toTheRight);
+	void reset() override;
 };
 
 
 class Alien : public EntityThatFires {
 public:
-	Alien(Array2f widthHeight, Array2f position, Array3f color,
+	Alien(Array2f widthHeight, Array2f position, Array3f color, entityAnimations animations,
 		int numStepsTilReverse);
 	void update(int ticks) override;
 private:
