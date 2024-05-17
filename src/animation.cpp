@@ -34,6 +34,10 @@ void Animation::updateTexture(int ticks) {
     }
 }
 
+void Animation::updateTexture() {
+    incrementTexture();
+}
+
 GLuint Animation::getCurrentTexture() const {
     if (isEmpty()) return 0;
     else return m_textureIDs[m_currentIndex];

@@ -13,8 +13,10 @@ using std::vector;
 class Animation {
 public:
 	Animation() = default;
+	// Animation(const vector<string> texturePaths, int updateEveryTicks = 1000, bool isLoop = false);
 	Animation(const vector<string> texturePaths, int updateEveryTicks = 1000, bool isLoop = true);
 	void updateTexture(int ticks);
+	void updateTexture();
 	void reset() { m_currentIndex = 0; }
 	GLuint getCurrentTexture() const;
 	bool isEmpty() const { return m_textureIDs.empty(); }

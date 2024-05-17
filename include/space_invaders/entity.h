@@ -31,8 +31,8 @@ public:
 	void setActive(bool active) { m_active = active; }
 	bool isActive() const { return m_active; }
 	void setDrawMe(bool drawMe) { m_drawMe = drawMe; }
-	void updateCurrentAnimation(int ticks);
 protected:
+	void updateCurrentAnimation(int ticks);
 	virtual void reset();
 
 	const Array2f m_widthHeight{.01, .01};
@@ -46,16 +46,12 @@ protected:
 };
 
 
-// class Barrier{
-// public:
-// 	Barrier(Array2f tileWidthHeight, Array2f position, Array3f color, barrierAnimations allAnimations);
-// 	// void update(int ticks) override;
-// };
-
 class BarrierTile : public Entity {
 public:
 	BarrierTile(Array2f widthHeight, Array2f position, Array3f color, entityAnimations animations);
 	void update(int ticks) override;
+protected:
+	void hit() override;
 };
 
 
@@ -86,7 +82,6 @@ class Player : public EntityThatFires {
 public:
 	Player(Array2f widthHeight, Array2f position, Array3f color, entityAnimations animations);
 	void update(int ticks) override;
-	void hit() override;
 	void takeStep(bool toTheRight);
 	void reset() override;
 };
@@ -108,4 +103,3 @@ private:
 	std::uniform_int_distribution<int> m_distribution;
 	const int m_fireProbability = ALIEN_FIRE_PROBABILITY_X100K;
 };
-

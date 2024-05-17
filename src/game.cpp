@@ -1,6 +1,7 @@
 #include <array>
 #include <thread>
 
+#include "space_invaders/constants.h"
 #include "space_invaders/entity.h"
 #include "space_invaders/game.h"
 
@@ -41,12 +42,12 @@ void Game::initAlienGrid(const int numRows, const int numCols) {
     const int numStepsTilReverse = extraSpaceX / stepSize.x();
     const Array2f gridBottomLeft{-gridOuterDims.x() / 2, 1 - gridOuterDims.y() - .2};
 
-    entityAnimations rowAnimation = allAlienAnimations[0];
+    entityAnimations *rowAnimation = &allAlienAnimations[0];
     for (int y = 0; y < numRows; y++) {
         if (y > 1 && y < 4) {
-            rowAnimation = allAlienAnimations[1];
+            rowAnimation = &allAlienAnimations[1];
         } else if (y == 4) {
-            rowAnimation = allAlienAnimations[2];
+            rowAnimation = &allAlienAnimations[2];
         }
         for (int x = 0; x < numCols; x++) {
             Array2f alienBottomLeft = gridBottomLeft + Array2f{x * gridIncXY.x(), y * gridIncXY.y()};
@@ -55,7 +56,7 @@ void Game::initAlienGrid(const int numRows, const int numCols) {
                 ALIEN_WIDTH_HEIGHT,
                 alienPosition,
                 ALIEN_COLOR,
-                rowAnimation,
+                *rowAnimation,
                 numStepsTilReverse
             );
             m_entities.push_back(alien);
@@ -66,7 +67,7 @@ void Game::initAlienGrid(const int numRows, const int numCols) {
 }
 
 void Game::initBarrierTiles(const Array2f barrierPosition, barrierAnimations allBarrierAnimations) {
-    entityAnimations* tileAnimations;
+    entityAnimations *tileAnimations;
     Array2f barrierBottomLeft = barrierPosition - Array2f{BARRIER_TILE_COLS, BARRIER_TILE_ROWS} * TILE_WIDTH_HEIGHT / 2;
     Array2f tileBottomLeft, tilePosition;
     for (int y = 0; y < BARRIER_TILE_ROWS; y++) {
@@ -75,17 +76,17 @@ void Game::initBarrierTiles(const Array2f barrierPosition, barrierAnimations all
             tilePosition = tileBottomLeft + TILE_WIDTH_HEIGHT / 2;
 
             if ((x == 0) && (y == BARRIER_TILE_ROWS - 1)) {
-                tileAnimations = &allBarrierAnimations[1];
+                tileAnimations = &allBarrierAnimations[BARRIER_BOTTOM_RIGHT];
             } else if ((x == BARRIER_TILE_COLS - 1) && (y == BARRIER_TILE_ROWS - 1)) {
-                tileAnimations = &allBarrierAnimations[2];
+                tileAnimations = &allBarrierAnimations[BARRIER_BOTTOM_LEFT];
             } else if ((x == 1) && (y == 1)) {
-                tileAnimations = &allBarrierAnimations[3];
+                tileAnimations = &allBarrierAnimations[BARRIER_TOP_LEFT];
             } else if ((x == 2) && (y == 1)) {
-                tileAnimations = &allBarrierAnimations[4];
+                tileAnimations = &allBarrierAnimations[BARRIER_TOP_RIGHT];
             } else if ((x > 0) && (x < 3) && (y == 0)) {
                 continue;
             } else {
-                tileAnimations = &allBarrierAnimations[0];
+                tileAnimations = &allBarrierAnimations[BARRIER_FULL_TILE];
             }
 
             auto barrierTile = std::make_shared<BarrierTile>(TILE_WIDTH_HEIGHT, tilePosition, TILE_COLOR, *tileAnimations);

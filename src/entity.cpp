@@ -32,6 +32,7 @@ void Entity::hit() {
     if (!m_active) return;  // can't be hit while dying or dead
     m_numLives--;
     if (!m_animations[ENTITY_DEATH_ANIMATION].isEmpty()) {
+        m_animations[ENTITY_DEATH_ANIMATION].reset();
         m_currentAnimation = ENTITY_DEATH_ANIMATION;
     }
     m_active = false;
@@ -40,7 +41,6 @@ void Entity::hit() {
 void Entity::updateCurrentAnimation(int ticks) {
     m_animations[m_currentAnimation].updateTexture(ticks);
     if (m_currentAnimation == ENTITY_DEATH_ANIMATION && m_animations[m_currentAnimation].isDone()) {
-        m_animations[m_currentAnimation].reset();
         m_currentAnimation = ENTITY_DEFAULT_ANIMATION;
         if (m_numLives == 0) m_drawMe = false;
         else reset();
@@ -56,6 +56,16 @@ BarrierTile::BarrierTile(Array2f widthHeight, Array2f position, Array3f color, e
 }
 
 void BarrierTile::update(int ticks)  {}
+
+void BarrierTile::hit() {
+    if (!m_active) return;
+    m_numLives--;
+    m_animations[m_currentAnimation].updateTexture();
+    if (m_animations[m_currentAnimation].isDone() || m_numLives == 0) {
+        m_active = false;
+        m_drawMe = false;
+    }
+}
 
 
 Projectile::Projectile(Array2f widthHeight, Array2f position, Array3f color, float vertStepSize) :
@@ -111,22 +121,13 @@ Player::Player(Array2f widthHeight, Array2f position, Array3f color, entityAnima
 
 void Player::update(int ticks)  {
     updateCurrentAnimation(ticks);
-    if (!m_active) return;
 }
 
 void Player::takeStep(bool toTheRight) {
     if (!m_active) return;
-    m_position.x() += toTheRight ? +.1 : -.1;
+    m_position.x() += toTheRight ? PLAYER_STEP_SIZE : -PLAYER_STEP_SIZE;
     m_position.x() = fmin(m_position.x(),  1 - m_widthHeight.x() / 2);
     m_position.x() = fmax(m_position.x(), -1 + m_widthHeight.x() / 2);
-}
-
-void Player::hit() {
-    if (!m_active) return;
-    m_numLives--;
-    m_animations[ENTITY_DEATH_ANIMATION].reset();
-    m_currentAnimation = ENTITY_DEATH_ANIMATION;
-    m_active = false;
 }
 
 void Player::reset() {
