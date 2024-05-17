@@ -2,14 +2,12 @@
 
 #include <random>
 #include <memory>
-#include <vector>
 #include <array>
 
 #include "space_invaders/aabb.h"
 #include "space_invaders/animation.h"
 #include "space_invaders/constants.h"
 
-using std::vector;
 using std::shared_ptr;
 using entityAnimations = std::array<Animation, 2>;
 

@@ -1,15 +1,15 @@
+#include <thread>
+
 #include "space_invaders/entity.h"
 #include "space_invaders/game.h"
 
-#include <thread>
-
 
 Game::Game() {
-    m_start_time = std::chrono::steady_clock::now();
+    m_startTime = std::chrono::steady_clock::now();
 
     initPlayer();
     initAlienGrid();
-    // initBarriers();
+    initBarriers();
 
     setPlayerTargets();
     setAlienTargets();
@@ -36,7 +36,7 @@ void Game::initAlienGrid(const int numRows, const int numCols) {
         + (colsRows - 1.f) * (gridIncXY - ALIEN_WIDTH_HEIGHT);
     const float extraSpaceX = 2 - gridOuterDims.x();
     const int numStepsTilReverse = extraSpaceX / stepSize.x();
-    const Array2f gridBottomLeft{-1, 1 - gridOuterDims.y()};
+    const Array2f gridBottomLeft{-gridOuterDims.x() / 2, 1 - gridOuterDims.y() - .2};
 
     entityAnimations rowAnimation = std::get<0>(allAlienAnimations);
     for (int y = 0; y < numRows; y++) {
@@ -93,8 +93,8 @@ void Game::setAlienTargets() {
 
 void Game::run() {
     while (m_interface.isAlive()) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(m_tick_ms));
-        auto elapsed = std::chrono::steady_clock::now() - m_start_time;
+        std::this_thread::sleep_for(std::chrono::milliseconds(m_tickMS));
+        auto elapsed = std::chrono::steady_clock::now() - m_startTime;
         auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed);
         // printf("Elapsed: %.2ld\n", elapsed_ms.count());
 

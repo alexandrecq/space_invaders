@@ -1,5 +1,7 @@
+#include <thread>
 
 #include "space_invaders/entity.h"
+#include "space_invaders/constants.h"
 #include "space_invaders/interface.h"
 
 
@@ -29,14 +31,17 @@ AABB Entity::aabb() const {
 void Entity::hit() {
     if (!m_active) return;  // can't be hit while dying or dead
     m_numLives--;
-    m_animations[ENTITY_DEATH_ANIMATION].reset();
-    m_currentAnimation = ENTITY_DEATH_ANIMATION;
+    if (!m_animations[ENTITY_DEATH_ANIMATION].isEmpty()) {
+        m_currentAnimation = ENTITY_DEATH_ANIMATION;
+    }
     m_active = false;
 }
 
 void Entity::updateCurrentAnimation(int ticks) {
     m_animations[m_currentAnimation].updateTexture(ticks);
-    if (m_animations[m_currentAnimation].isDone()) {
+    if (m_currentAnimation == ENTITY_DEATH_ANIMATION && m_animations[m_currentAnimation].isDone()) {
+        m_animations[m_currentAnimation].reset();
+        m_currentAnimation = ENTITY_DEFAULT_ANIMATION;
         if (m_numLives == 0) m_drawMe = false;
         else reset();
     }
@@ -125,7 +130,8 @@ void Player::hit() {
 }
 
 void Player::reset() {
-    m_currentAnimation = ENTITY_DEFAULT_ANIMATION;
+    // std::this_thread::sleep_for(std::chrono::milliseconds(PLAYER_DEATH_SLEEP_MS));
+    // m_currentAnimation = ENTITY_DEFAULT_ANIMATION;
     m_position = PLAYER_START_POSITION;
     m_active = true;
 }
@@ -136,6 +142,7 @@ Alien::Alien(Array2f widthHeight,Array2f position, Array3f color, entityAnimatio
     EntityThatFires(widthHeight, position, color, animations, false),
     m_numStepsTilReverse(numStepsTilReverse)
 {
+    m_stepsTaken = numStepsTilReverse / 2;  //grid starts at center of screen
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<int> dist(1, 100000);

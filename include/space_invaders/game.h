@@ -27,6 +27,6 @@ private:
 	vector<shared_ptr<Alien>> m_aliens;
 	vector<shared_ptr<Entity>> m_barriers;
 
-	std::chrono::time_point<std::chrono::steady_clock> m_start_time;
-	const long long m_tick_ms = GAME_TICK_MS;
+	std::chrono::time_point<std::chrono::steady_clock> m_startTime;
+	const long long m_tickMS = GAME_TICK_MS;
 };
