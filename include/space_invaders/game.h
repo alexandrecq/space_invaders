@@ -13,11 +13,13 @@ public:
 private:
 	void initPlayer();
 	void initAlienGrid(const int numRows = GAME_NUM_ALIEN_ROWS, const int numCols = GAME_NUM_ALIEN_COLS);
+	void initBarrierTiles(const Array2f bottomLeft, barrierAnimations allAnimations);
 	void initBarriers(const int numBarriers = GAME_NUM_BARRIERS);
 	void setPlayerTargets();
 	void setAlienTargets();
-	entityAnimations loadPlayerAnimations();
-	std::tuple<entityAnimations, entityAnimations, entityAnimations> loadAlienAnimations();
+	void loadPlayerAnimations(entityAnimations& playerAnimations);
+	void loadAlienAnimations(std::array<entityAnimations, 3>& alienAnimations);
+	void loadBarrierAnimations(barrierAnimations& barrierAnimations);
 
 	Interface m_interface;
 	// static constexpr int m_max_entities = 10;

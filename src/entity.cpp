@@ -50,12 +50,12 @@ void Entity::updateCurrentAnimation(int ticks) {
 void Entity::reset() {}
 
 
-Barrier::Barrier(Array2f widthHeight, Array2f position, Array3f color) :
-    Entity(widthHeight, position, color) {
+BarrierTile::BarrierTile(Array2f widthHeight, Array2f position, Array3f color, entityAnimations animations) :
+    Entity(widthHeight, position, color, animations) {
     m_numLives = BARRIER_NUM_LIVES;
 }
 
-void Barrier::update(int ticks)  {}
+void BarrierTile::update(int ticks)  {}
 
 
 Projectile::Projectile(Array2f widthHeight, Array2f position, Array3f color, float vertStepSize) :

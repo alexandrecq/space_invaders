@@ -1,3 +1,4 @@
+#include <array>
 #include <thread>
 
 #include "space_invaders/entity.h"
@@ -17,7 +18,8 @@ Game::Game() {
 }
 
 void Game::initPlayer() {
-    entityAnimations playerAnimations = loadPlayerAnimations();
+    entityAnimations playerAnimations;
+    loadPlayerAnimations(playerAnimations);
 
     m_player = std::make_shared<Player>(PLAYER_WIDTH_HEIGHT, PLAYER_START_POSITION, PLAYER_COLOR, playerAnimations);
     m_entities.push_back(m_player);
@@ -29,7 +31,8 @@ void Game::initPlayer() {
 void Game::initAlienGrid(const int numRows, const int numCols) {
     const Array2f gridIncXY = 1.5 * ALIEN_WIDTH_HEIGHT;
     const Array2f stepSize = {ALIEN_WIDTH_HEIGHT.x() / 2, -ALIEN_WIDTH_HEIGHT.y() / 2};
-    std::tuple<entityAnimations, entityAnimations, entityAnimations> allAlienAnimations = loadAlienAnimations();
+    std::array<entityAnimations, 3> allAlienAnimations;
+    loadAlienAnimations(allAlienAnimations);
 
     const Array2f colsRows{numCols, numRows};
     const Array2f gridOuterDims = (colsRows * ALIEN_WIDTH_HEIGHT)
@@ -38,12 +41,12 @@ void Game::initAlienGrid(const int numRows, const int numCols) {
     const int numStepsTilReverse = extraSpaceX / stepSize.x();
     const Array2f gridBottomLeft{-gridOuterDims.x() / 2, 1 - gridOuterDims.y() - .2};
 
-    entityAnimations rowAnimation = std::get<0>(allAlienAnimations);
+    entityAnimations rowAnimation = allAlienAnimations[0];
     for (int y = 0; y < numRows; y++) {
         if (y > 1 && y < 4) {
-            rowAnimation = std::get<1>(allAlienAnimations);
+            rowAnimation = allAlienAnimations[1];
         } else if (y == 4) {
-            rowAnimation = std::get<2>(allAlienAnimations);
+            rowAnimation = allAlienAnimations[2];
         }
         for (int x = 0; x < numCols; x++) {
             Array2f alienBottomLeft = gridBottomLeft + Array2f{x * gridIncXY.x(), y * gridIncXY.y()};
@@ -62,17 +65,45 @@ void Game::initAlienGrid(const int numRows, const int numCols) {
     }
 }
 
+void Game::initBarrierTiles(const Array2f barrierPosition, barrierAnimations allBarrierAnimations) {
+    entityAnimations* tileAnimations;
+    Array2f barrierBottomLeft = barrierPosition - Array2f{BARRIER_TILE_COLS, BARRIER_TILE_ROWS} * TILE_WIDTH_HEIGHT / 2;
+    Array2f tileBottomLeft, tilePosition;
+    for (int y = 0; y < BARRIER_TILE_ROWS; y++) {
+        for (int x = 0; x < BARRIER_TILE_COLS; x++) {
+            tileBottomLeft = barrierBottomLeft + Array2f{x * TILE_WIDTH_HEIGHT.x(), y * TILE_WIDTH_HEIGHT.y()};
+            tilePosition = tileBottomLeft + TILE_WIDTH_HEIGHT / 2;
+
+            if ((x == 0) && (y == BARRIER_TILE_ROWS - 1)) {
+                tileAnimations = &allBarrierAnimations[1];
+            } else if ((x == BARRIER_TILE_COLS - 1) && (y == BARRIER_TILE_ROWS - 1)) {
+                tileAnimations = &allBarrierAnimations[2];
+            } else if ((x == 1) && (y == 1)) {
+                tileAnimations = &allBarrierAnimations[3];
+            } else if ((x == 2) && (y == 1)) {
+                tileAnimations = &allBarrierAnimations[4];
+            } else if ((x > 0) && (x < 3) && (y == 0)) {
+                continue;
+            } else {
+                tileAnimations = &allBarrierAnimations[0];
+            }
+
+            auto barrierTile = std::make_shared<BarrierTile>(TILE_WIDTH_HEIGHT, tilePosition, TILE_COLOR, *tileAnimations);
+            m_entities.push_back(barrierTile);
+            m_barriers.push_back(barrierTile);
+        }
+    }
+}
+
 void Game::initBarriers(const int numBarriers) {
-    const Array2f barrierWidthHeight{.2, .2};
-    const Array3f barrierColor = {.5, .4, .1};
     const float incX = 2 / ((float)numBarriers + 1);
     const float midlineY = -.7;
 
+    barrierAnimations allBarrierAnimations;
+    loadBarrierAnimations(allBarrierAnimations);
     for (int idx = 0; idx < numBarriers; idx++) {
         const Array2f barrierPosition{-1 + (idx + 1) * incX, midlineY};
-        auto barrier = std::make_shared<Barrier>(barrierWidthHeight, barrierPosition, barrierColor);
-        m_entities.push_back(barrier);
-        m_barriers.push_back(barrier);
+        initBarrierTiles(barrierPosition, allBarrierAnimations);
     }
 }
 
@@ -111,22 +142,24 @@ void Game::run() {
     }
 }
 
-entityAnimations Game::loadPlayerAnimations() {
-    const Animation playerDefaultAnimation(PLAYER_DEFAULT_TEXTURE_PATHS);
-    const Animation playerDeathAnimation(PLAYER_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS, false);
-    return {playerDefaultAnimation, playerDeathAnimation};
+void Game::loadPlayerAnimations(entityAnimations& playerAnimations) {
+    playerAnimations[0] = Animation(PLAYER_DEFAULT_TEXTURE_PATHS);
+    playerAnimations[1] = Animation(PLAYER_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS, false);
 }
 
-std::tuple<entityAnimations, entityAnimations, entityAnimations> Game::loadAlienAnimations() {
-    const Animation alienDefaultAnimationA(ALIEN_A_DEFAULT_TEXTURE_PATHS, ALIEN_STEP_EVERY_TICKS);
-    const Animation alienDefaultAnimationB(ALIEN_B_DEFAULT_TEXTURE_PATHS, ALIEN_STEP_EVERY_TICKS);
-    const Animation alienDefaultAnimationC(ALIEN_C_DEFAULT_TEXTURE_PATHS, ALIEN_STEP_EVERY_TICKS);
-    const Animation alienDeathAnimationA(ALIEN_A_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS, false);
-    const Animation alienDeathAnimationB(ALIEN_B_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS, false);
-    const Animation alienDeathAnimationC(ALIEN_C_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS, false);
-    return {
-        {alienDefaultAnimationA, alienDeathAnimationA},
-        {alienDefaultAnimationB, alienDeathAnimationB},
-        {alienDefaultAnimationC, alienDeathAnimationC},
-    };
+void Game::loadAlienAnimations(std::array<entityAnimations, 3>& alienAnimations) {
+    alienAnimations[0][0] = Animation(ALIEN_A_DEFAULT_TEXTURE_PATHS, ALIEN_STEP_EVERY_TICKS);
+    alienAnimations[1][0] = Animation(ALIEN_B_DEFAULT_TEXTURE_PATHS, ALIEN_STEP_EVERY_TICKS);
+    alienAnimations[2][0] = Animation(ALIEN_C_DEFAULT_TEXTURE_PATHS, ALIEN_STEP_EVERY_TICKS);
+    alienAnimations[0][1] = Animation(ALIEN_A_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS, false);
+    alienAnimations[1][1] = Animation(ALIEN_B_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS, false);
+    alienAnimations[2][1] = Animation(ALIEN_C_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS, false);
+}
+
+void Game::loadBarrierAnimations(barrierAnimations& barrierAnimations) {
+    barrierAnimations[0] = {Animation(BARRIER_A_DEFAULT_TEXTURE_PATHS, false), Animation()};
+    barrierAnimations[1] = {Animation(BARRIER_B_DEFAULT_TEXTURE_PATHS, false), Animation()};
+    barrierAnimations[2] = {Animation(BARRIER_C_DEFAULT_TEXTURE_PATHS, false), Animation()};
+    barrierAnimations[3] = {Animation(BARRIER_D_DEFAULT_TEXTURE_PATHS, false), Animation()};
+    barrierAnimations[4] = {Animation(BARRIER_E_DEFAULT_TEXTURE_PATHS, false), Animation()};
 }

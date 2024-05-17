@@ -10,6 +10,7 @@
 
 using std::shared_ptr;
 using entityAnimations = std::array<Animation, 2>;
+using barrierAnimations = std::array<entityAnimations, 5>;
 
 class Interface;
 
@@ -45,9 +46,15 @@ protected:
 };
 
 
-class Barrier : public Entity {
+// class Barrier{
+// public:
+// 	Barrier(Array2f tileWidthHeight, Array2f position, Array3f color, barrierAnimations allAnimations);
+// 	// void update(int ticks) override;
+// };
+
+class BarrierTile : public Entity {
 public:
-	Barrier(Array2f widthHeight, Array2f position, Array3f color);
+	BarrierTile(Array2f widthHeight, Array2f position, Array3f color, entityAnimations animations);
 	void update(int ticks) override;
 };
 
