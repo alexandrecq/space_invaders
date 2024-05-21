@@ -8,3 +8,20 @@ const vector<string> generateTexturePaths(const std::string& baseName, int numTe
     }
     return texturePaths;
 }
+
+
+template class RandomNumberGenerator<int>;
+
+template<typename T>
+RandomNumberGenerator<T>::RandomNumberGenerator(T maxValue) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> dist(1, maxValue);
+    m_gen = gen;
+    m_distribution = dist;
+}
+
+template<typename T>
+void RandomNumberGenerator<T>::generateNumber(T* numberOut) {
+    *numberOut = m_distribution(m_gen);
+}

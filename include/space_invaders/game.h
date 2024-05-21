@@ -2,6 +2,7 @@
 
 #include <chrono>
 
+#include "space_invaders/constants.h"
 #include "space_invaders/entity.h"
 #include "space_invaders/interface.h"
 
@@ -12,8 +13,16 @@ public:
 	void run();
 private:
 	void initPlayer();
-	void initAlienGrid(const int numRows = GAME_NUM_ALIEN_ROWS, const int numCols = GAME_NUM_ALIEN_COLS);
-	void initBarrierTiles(const Array2f bottomLeft, barrierAnimations allAnimations);
+	void initAlienGrid(
+		const int numRows = GAME_NUM_ALIEN_ROWS, const int numCols = GAME_NUM_ALIEN_COLS,
+		const Array2f alienWidthHeight = ALIEN_WIDTH_HEIGHT, const Array3f alienColor = ALIEN_COLOR
+	);
+	void initSaucer();
+	void initBarrierTiles(
+		const Array2f barrierPosition, barrierAnimations& allAnimations,
+		const int tileRows = BARRIER_TILE_ROWS, const int tileCols = BARRIER_TILE_COLS,
+		const Array2f tileWidthHeight = TILE_WIDTH_HEIGHT, const Array3f tileColor = TILE_COLOR
+	);
 	void initBarriers(const int numBarriers = GAME_NUM_BARRIERS);
 	void setPlayerTargets();
 	void setAlienTargets();

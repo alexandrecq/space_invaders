@@ -1,7 +1,6 @@
-#include <thread>
+// #include <thread>
 
 #include "space_invaders/entity.h"
-#include "space_invaders/constants.h"
 #include "space_invaders/interface.h"
 
 
@@ -95,6 +94,35 @@ void Projectile::update(int ticks)  {
 }
 
 
+// // const Array2f& widthHeight, const Array2f& position, const Array3f& color, entityAnimations animations,
+// //         const int& stepEveryTicks, const int& stepSize) :
+// Saucer::Saucer(entityAnimations animations) :
+//     Entity(SAUCER_WIDTH_HEIGHT, {0, 0}, Array3f{1, 1, 1}, animations) {
+// // , 10, .1, 100)
+//     m_active = false;
+//     m_drawMe = false;
+// }
+
+// void Saucer::update(int ticks)  {
+//     // updateCurrentAnimation(ticks);
+//     const int randomNumber = m_distribution(m_gen);
+//     if (randomNumber <= m_appearProbability) {
+//         printf("%d, %d, %d, %.2f\n", isActive(), m_drawMe, randomNumber, m_position.x());
+//         m_active = true;
+//         m_drawMe = true;
+//         m_position = {-1, SAUCER_POS_Y};
+//     }
+//     if (!m_active) return;
+//     if (ticks - m_lastStepTick > m_stepEveryTicks) {
+//         // printf("%.2f\n", m_stepSize.x());
+//         // printf("%d, %d, %d\n",  ticks, m_lastStepTick, m_stepEveryTicks);
+//         m_position.x() += m_stepSize.x();
+//         // printf("%d, %d, %d, %.2f\n", isActive(), m_drawMe, randomNumber, m_position.x());
+//         m_lastStepTick = ticks;
+//     }
+// }
+
+
 EntityThatFires::EntityThatFires(Array2f widthHeight, Array2f position, Array3f color, entityAnimations animations, bool firesUp) :
     Entity(widthHeight, position, color, animations), m_firesUp(firesUp) {
     //set default values for projectile
@@ -138,24 +166,30 @@ void Player::reset() {
 }
 
 
-Alien::Alien(Array2f widthHeight,Array2f position, Array3f color, entityAnimations animations,
-             int numStepsTilReverse) :
+// Alien::Alien(const Array2f& widthHeight, const Array2f& position, const Array3f& color, entityAnimations animations,
+//              const int& numStepsTilReverse) :
+//     EntityThatFires(widthHeight, position, color, animations, false),
+//     m_numStepsTilReverse(numStepsTilReverse)
+// {
+//     m_stepsTaken = numStepsTilReverse / 2;  //grid starts at center of screen
+// }
+
+Alien::Alien(const Array2f& widthHeight, const Array2f& position, const Array3f& color, entityAnimations animations,
+             const int& numStepsTilReverse,
+             const int& stepEveryTicks, const Array2f& stepSize, const int& fireProb) :
+        // const int& stepEveryTicks, const int& stepSize) :
     EntityThatFires(widthHeight, position, color, animations, false),
-    m_numStepsTilReverse(numStepsTilReverse)
+    m_stepEveryTicks(stepEveryTicks), m_stepSize(stepSize), m_numStepsTilReverse(numStepsTilReverse)
 {
     m_stepsTaken = numStepsTilReverse / 2;  //grid starts at center of screen
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<int> dist(1, 100000);
-    m_gen = gen;
-    m_distribution = dist;
 }
 
 void Alien::update(int ticks)  {
     updateCurrentAnimation(ticks);
     if (!m_active) return;
 
-    const int randomNumber = m_distribution(m_gen);
+    int randomNumber;
+    m_rng.generateNumber(&randomNumber);
     if (randomNumber <= m_fireProbability) {
         fire();
     }
@@ -172,4 +206,3 @@ void Alien::update(int ticks)  {
         m_lastStepTick = ticks;
     }
 }
-

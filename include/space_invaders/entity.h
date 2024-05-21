@@ -1,12 +1,12 @@
 #pragma once
 
-#include <random>
 #include <memory>
 #include <array>
 
 #include "space_invaders/aabb.h"
 #include "space_invaders/animation.h"
 #include "space_invaders/constants.h"
+#include "space_invaders/utils.h"
 
 using std::shared_ptr;
 using entityAnimations = std::array<Animation, 2>;
@@ -89,17 +89,33 @@ public:
 
 class Alien : public EntityThatFires {
 public:
-	Alien(Array2f widthHeight, Array2f position, Array3f color, entityAnimations animations,
-		int numStepsTilReverse);
+	// Alien(const Array2f& widthHeight, const Array2f& position, const Array3f& color, entityAnimations animations,
+	// 	const int& numStepsTilReverse);
+	Alien(const Array2f& widthHeight, const Array2f& position, const Array3f& color, entityAnimations animations,
+		const int& numStepsTilReverse,
+		const int& stepEveryTicks = ALIEN_STEP_EVERY_TICKS,
+		const Array2f& stepSize = ALIEN_STEP_SIZE,
+		const int& fireProb = ALIEN_FIRE_PROBABILITY_X100K
+	);
 	void update(int ticks) override;
-private:
+protected:
 	const int m_stepEveryTicks = ALIEN_STEP_EVERY_TICKS;
 	Array2f m_stepSize = ALIEN_STEP_SIZE;
-	const int m_numStepsTilReverse;
 	int m_lastStepTick = 0;
+private:
+	const int m_numStepsTilReverse;
 	int m_stepsTaken = 0;
-
-	std::mt19937 m_gen;
-	std::uniform_int_distribution<int> m_distribution;
+	RandomNumberGenerator<int> m_rng;
 	const int m_fireProbability = ALIEN_FIRE_PROBABILITY_X100K;
 };
+
+
+// class Saucer : public Entity {
+// public:
+// 	// Saucer(Array2f widthHeight, Array2f position, entityAnimations animations);
+// 	Saucer(entityAnimations animations);
+// 	void update(int ticks) override;
+// private:
+// 	RandomNumberGenerator<int> m_rng;
+// 	const int m_appearProbability = SAUCER_APPEAR_PROBABILITY_X100K;
+// };

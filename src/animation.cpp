@@ -13,6 +13,7 @@ Animation::Animation(const vector<string> texturePaths, int updateEveryTicks, bo
         checkSingleTextureLoad(path);
         GLuint textureID;
         bool loaded = LoadTextureFromFile((RELATIVE_TEXTURE_PATH + path).c_str(), &textureID);
+        // printf("%s\n", path.c_str());
         assert(loaded);
         m_textureIDs.push_back(textureID);
     }

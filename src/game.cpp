@@ -12,6 +12,7 @@ Game::Game() {
     initPlayer();
     initAlienGrid();
     initBarriers();
+    // initSaucer();
 
     setPlayerTargets();
     setAlienTargets();
@@ -29,15 +30,18 @@ void Game::initPlayer() {
     m_entities.push_back(m_player->getProjectile());
 }
 
-void Game::initAlienGrid(const int numRows, const int numCols) {
-    const Array2f gridIncXY = 1.5 * ALIEN_WIDTH_HEIGHT;
-    const Array2f stepSize = {ALIEN_WIDTH_HEIGHT.x() / 2, -ALIEN_WIDTH_HEIGHT.y() / 2};
+void Game::initAlienGrid(
+    const int numRows, const int numCols,
+    const Array2f alienWidthHeight, const Array3f alienColor
+) {
+    const Array2f gridIncXY = 1.5 * alienWidthHeight;
+    const Array2f stepSize = {alienWidthHeight.x() / 2, -alienWidthHeight.y() / 2};
     std::array<entityAnimations, 3> allAlienAnimations;
     loadAlienAnimations(allAlienAnimations);
 
     const Array2f colsRows{numCols, numRows};
-    const Array2f gridOuterDims = (colsRows * ALIEN_WIDTH_HEIGHT)
-        + (colsRows - 1.f) * (gridIncXY - ALIEN_WIDTH_HEIGHT);
+    const Array2f gridOuterDims = (colsRows * alienWidthHeight)
+        + (colsRows - 1.f) * (gridIncXY - alienWidthHeight);
     const float extraSpaceX = 2 - gridOuterDims.x();
     const int numStepsTilReverse = extraSpaceX / stepSize.x();
     const Array2f gridBottomLeft{-gridOuterDims.x() / 2, 1 - gridOuterDims.y() - .2};
@@ -51,11 +55,11 @@ void Game::initAlienGrid(const int numRows, const int numCols) {
         }
         for (int x = 0; x < numCols; x++) {
             Array2f alienBottomLeft = gridBottomLeft + Array2f{x * gridIncXY.x(), y * gridIncXY.y()};
-            Array2f alienPosition = alienBottomLeft + ALIEN_WIDTH_HEIGHT / 2;
+            Array2f alienPosition = alienBottomLeft + alienWidthHeight / 2;
             auto alien = std::make_shared<Alien>(
-                ALIEN_WIDTH_HEIGHT,
+                alienWidthHeight,
                 alienPosition,
-                ALIEN_COLOR,
+                alienColor,
                 *rowAnimation,
                 numStepsTilReverse
             );
@@ -66,18 +70,30 @@ void Game::initAlienGrid(const int numRows, const int numCols) {
     }
 }
 
-void Game::initBarrierTiles(const Array2f barrierPosition, barrierAnimations allBarrierAnimations) {
-    entityAnimations *tileAnimations;
-    Array2f barrierBottomLeft = barrierPosition - Array2f{BARRIER_TILE_COLS, BARRIER_TILE_ROWS} * TILE_WIDTH_HEIGHT / 2;
-    Array2f tileBottomLeft, tilePosition;
-    for (int y = 0; y < BARRIER_TILE_ROWS; y++) {
-        for (int x = 0; x < BARRIER_TILE_COLS; x++) {
-            tileBottomLeft = barrierBottomLeft + Array2f{x * TILE_WIDTH_HEIGHT.x(), y * TILE_WIDTH_HEIGHT.y()};
-            tilePosition = tileBottomLeft + TILE_WIDTH_HEIGHT / 2;
+// void Game::initSaucer() {
+//     entityAnimations saucerAnimations{Animation(SAUCER_DEFAULT_TEXTURE_PATHS, false), Animation()};
+//     // auto alien = std::make_shared<Saucer>({saucerDefaultAnimation, Animation()});
+//     auto saucer = std::make_shared<Saucer>(saucerAnimations);
+//     m_entities.push_back(saucer);
+//     m_entities.push_back(saucer->getProjectile());
+//     m_aliens.push_back(saucer);
+// }
 
-            if ((x == 0) && (y == BARRIER_TILE_ROWS - 1)) {
+void Game::initBarrierTiles(
+        const Array2f barrierPosition, barrierAnimations& allBarrierAnimations,
+        const int tileRows, const int tileCols, const Array2f tileWidthHeight, const Array3f tileColor
+) {
+    entityAnimations *tileAnimations;
+    Array2f barrierBottomLeft = barrierPosition - Array2f{tileCols, tileRows} * tileWidthHeight / 2;
+    Array2f tileBottomLeft, tilePosition;
+    for (int y = 0; y < tileRows; y++) {
+        for (int x = 0; x < tileCols; x++) {
+            tileBottomLeft = barrierBottomLeft + Array2f{x, y} * tileWidthHeight;
+            tilePosition = tileBottomLeft + tileWidthHeight / 2;
+
+            if ((x == 0) && (y == tileRows - 1)) {
                 tileAnimations = &allBarrierAnimations[BARRIER_BOTTOM_RIGHT];
-            } else if ((x == BARRIER_TILE_COLS - 1) && (y == BARRIER_TILE_ROWS - 1)) {
+            } else if ((x == tileCols - 1) && (y == tileRows - 1)) {
                 tileAnimations = &allBarrierAnimations[BARRIER_BOTTOM_LEFT];
             } else if ((x == 1) && (y == 1)) {
                 tileAnimations = &allBarrierAnimations[BARRIER_TOP_LEFT];
@@ -89,7 +105,7 @@ void Game::initBarrierTiles(const Array2f barrierPosition, barrierAnimations all
                 tileAnimations = &allBarrierAnimations[BARRIER_FULL_TILE];
             }
 
-            auto barrierTile = std::make_shared<BarrierTile>(TILE_WIDTH_HEIGHT, tilePosition, TILE_COLOR, *tileAnimations);
+            auto barrierTile = std::make_shared<BarrierTile>(tileWidthHeight, tilePosition, tileColor, *tileAnimations);
             m_entities.push_back(barrierTile);
             m_barriers.push_back(barrierTile);
         }
