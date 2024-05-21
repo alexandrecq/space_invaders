@@ -89,8 +89,6 @@ public:
 
 class Alien : public EntityThatFires {
 public:
-	// Alien(const Array2f& widthHeight, const Array2f& position, const Array3f& color, entityAnimations animations,
-	// 	const int& numStepsTilReverse);
 	Alien(const Array2f& widthHeight, const Array2f& position, const Array3f& color, entityAnimations animations,
 		const int& numStepsTilReverse,
 		const int& stepEveryTicks = ALIEN_STEP_EVERY_TICKS,
@@ -99,23 +97,22 @@ public:
 	);
 	void update(int ticks) override;
 protected:
-	const int m_stepEveryTicks = ALIEN_STEP_EVERY_TICKS;
-	Array2f m_stepSize = ALIEN_STEP_SIZE;
+	const int m_stepEveryTicks;
+	Array2f m_stepSize;
 	int m_lastStepTick = 0;
 private:
 	const int m_numStepsTilReverse;
 	int m_stepsTaken = 0;
 	RandomNumberGenerator<int> m_rng;
-	const int m_fireProbability = ALIEN_FIRE_PROBABILITY_X100K;
+	const int m_fireProbability;
 };
 
 
-// class Saucer : public Entity {
-// public:
-// 	// Saucer(Array2f widthHeight, Array2f position, entityAnimations animations);
-// 	Saucer(entityAnimations animations);
-// 	void update(int ticks) override;
-// private:
-// 	RandomNumberGenerator<int> m_rng;
-// 	const int m_appearProbability = SAUCER_APPEAR_PROBABILITY_X100K;
-// };
+class Saucer : public Alien {
+public:
+	Saucer(entityAnimations animations);
+	void update(int ticks) override;
+private:
+	const int m_appearProbability = SAUCER_APPEAR_PROBABILITY_X100K;
+	RandomNumberGenerator<int> m_rng;
+};

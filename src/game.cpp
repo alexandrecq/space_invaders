@@ -12,7 +12,7 @@ Game::Game() {
     initPlayer();
     initAlienGrid();
     initBarriers();
-    // initSaucer();
+    initSaucer();
 
     setPlayerTargets();
     setAlienTargets();
@@ -70,14 +70,15 @@ void Game::initAlienGrid(
     }
 }
 
-// void Game::initSaucer() {
-//     entityAnimations saucerAnimations{Animation(SAUCER_DEFAULT_TEXTURE_PATHS, false), Animation()};
-//     // auto alien = std::make_shared<Saucer>({saucerDefaultAnimation, Animation()});
-//     auto saucer = std::make_shared<Saucer>(saucerAnimations);
-//     m_entities.push_back(saucer);
-//     m_entities.push_back(saucer->getProjectile());
-//     m_aliens.push_back(saucer);
-// }
+void Game::initSaucer() {
+    entityAnimations saucerAnimations{
+        Animation(SAUCER_DEFAULT_TEXTURE_PATHS, false),
+        Animation(SAUCER_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS, false)
+    };
+    auto saucer = std::make_shared<Saucer>(saucerAnimations);
+    m_entities.push_back(saucer);
+    m_aliens.push_back(saucer);
+}
 
 void Game::initBarrierTiles(
         const Array2f barrierPosition, barrierAnimations& allBarrierAnimations,
@@ -113,14 +114,17 @@ void Game::initBarrierTiles(
 }
 
 void Game::initBarriers(const int numBarriers) {
-    const float incX = 2 / ((float)numBarriers + 1);
-    const float midlineY = -.7;
+    const float barrierWidth = BARRIER_TILE_COLS * TILE_WIDTH_HEIGHT.x();
+    const float gapWidth = (2.f - float(numBarriers) * barrierWidth) / ((float)numBarriers + 1);
+    const float incX = barrierWidth + gapWidth;
+    const float firstBarrierX = -1 + gapWidth + barrierWidth / 2.f;
 
     barrierAnimations allBarrierAnimations;
     loadBarrierAnimations(allBarrierAnimations);
+    Array2f barrierPosition = {firstBarrierX, BARRIER_POS_Y};
     for (int idx = 0; idx < numBarriers; idx++) {
-        const Array2f barrierPosition{-1 + (idx + 1) * incX, midlineY};
         initBarrierTiles(barrierPosition, allBarrierAnimations);
+        barrierPosition.x() += incX;
     }
 }
 

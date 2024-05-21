@@ -1,5 +1,3 @@
-// #include <thread>
-
 #include "space_invaders/entity.h"
 #include "space_invaders/interface.h"
 
@@ -38,12 +36,12 @@ void Entity::hit() {
 }
 
 void Entity::updateCurrentAnimation(int ticks) {
-    m_animations[m_currentAnimation].updateTexture(ticks);
     if (m_currentAnimation == ENTITY_DEATH_ANIMATION && m_animations[m_currentAnimation].isDone()) {
         m_currentAnimation = ENTITY_DEFAULT_ANIMATION;
-        if (m_numLives == 0) m_drawMe = false;
+        if (m_numLives <= 0) m_drawMe = false;
         else reset();
     }
+    else m_animations[m_currentAnimation].updateTexture(ticks);
 }
 
 void Entity::reset() {}
@@ -94,35 +92,6 @@ void Projectile::update(int ticks)  {
 }
 
 
-// // const Array2f& widthHeight, const Array2f& position, const Array3f& color, entityAnimations animations,
-// //         const int& stepEveryTicks, const int& stepSize) :
-// Saucer::Saucer(entityAnimations animations) :
-//     Entity(SAUCER_WIDTH_HEIGHT, {0, 0}, Array3f{1, 1, 1}, animations) {
-// // , 10, .1, 100)
-//     m_active = false;
-//     m_drawMe = false;
-// }
-
-// void Saucer::update(int ticks)  {
-//     // updateCurrentAnimation(ticks);
-//     const int randomNumber = m_distribution(m_gen);
-//     if (randomNumber <= m_appearProbability) {
-//         printf("%d, %d, %d, %.2f\n", isActive(), m_drawMe, randomNumber, m_position.x());
-//         m_active = true;
-//         m_drawMe = true;
-//         m_position = {-1, SAUCER_POS_Y};
-//     }
-//     if (!m_active) return;
-//     if (ticks - m_lastStepTick > m_stepEveryTicks) {
-//         // printf("%.2f\n", m_stepSize.x());
-//         // printf("%d, %d, %d\n",  ticks, m_lastStepTick, m_stepEveryTicks);
-//         m_position.x() += m_stepSize.x();
-//         // printf("%d, %d, %d, %.2f\n", isActive(), m_drawMe, randomNumber, m_position.x());
-//         m_lastStepTick = ticks;
-//     }
-// }
-
-
 EntityThatFires::EntityThatFires(Array2f widthHeight, Array2f position, Array3f color, entityAnimations animations, bool firesUp) :
     Entity(widthHeight, position, color, animations), m_firesUp(firesUp) {
     //set default values for projectile
@@ -166,20 +135,12 @@ void Player::reset() {
 }
 
 
-// Alien::Alien(const Array2f& widthHeight, const Array2f& position, const Array3f& color, entityAnimations animations,
-//              const int& numStepsTilReverse) :
-//     EntityThatFires(widthHeight, position, color, animations, false),
-//     m_numStepsTilReverse(numStepsTilReverse)
-// {
-//     m_stepsTaken = numStepsTilReverse / 2;  //grid starts at center of screen
-// }
-
 Alien::Alien(const Array2f& widthHeight, const Array2f& position, const Array3f& color, entityAnimations animations,
              const int& numStepsTilReverse,
              const int& stepEveryTicks, const Array2f& stepSize, const int& fireProb) :
-        // const int& stepEveryTicks, const int& stepSize) :
     EntityThatFires(widthHeight, position, color, animations, false),
-    m_stepEveryTicks(stepEveryTicks), m_stepSize(stepSize), m_numStepsTilReverse(numStepsTilReverse)
+    m_stepEveryTicks(stepEveryTicks), m_stepSize(stepSize), m_numStepsTilReverse(numStepsTilReverse),
+    m_fireProbability(fireProb)
 {
     m_stepsTaken = numStepsTilReverse / 2;  //grid starts at center of screen
 }
@@ -190,9 +151,7 @@ void Alien::update(int ticks)  {
 
     int randomNumber;
     m_rng.generateNumber(&randomNumber);
-    if (randomNumber <= m_fireProbability) {
-        fire();
-    }
+    if (randomNumber <= m_fireProbability) fire();
 
     if (ticks - m_lastStepTick > m_stepEveryTicks) {
         if (m_stepsTaken == m_numStepsTilReverse) {
@@ -204,5 +163,40 @@ void Alien::update(int ticks)  {
             m_stepsTaken += 1;
         }
         m_lastStepTick = ticks;
+    }
+}
+
+
+Saucer::Saucer(entityAnimations animations) :
+    Alien(SAUCER_WIDTH_HEIGHT, {0, 0}, Array3f{1, 1, 1}, animations,
+          0, SAUCER_STEP_EVERY_TICKS, SAUCER_STEP_SIZE, 0)
+{
+    m_active = false;
+    m_drawMe = false;
+}
+
+void Saucer::update(int ticks)
+{
+    updateCurrentAnimation(ticks);
+    if (m_currentAnimation == ENTITY_DEATH_ANIMATION && !m_animations[m_currentAnimation].isDone()) {
+        return;
+    }
+    int randomNumber;
+    m_rng.generateNumber(&randomNumber);
+    if (!m_active && randomNumber <= m_appearProbability) {
+        m_active = true;
+        m_drawMe = true;
+        m_numLives = 1;
+        m_position = {-1 - m_widthHeight.x() / 2, SAUCER_POS_Y};
+    }
+    if (!m_active) return;
+
+    if (ticks - m_lastStepTick > m_stepEveryTicks) {
+        m_position.x() += m_stepSize.x();
+        m_lastStepTick = ticks;
+    }
+    if (!aabb().intersects(gameAABB)) {
+        m_active = false;
+        m_drawMe = false;
     }
 }
