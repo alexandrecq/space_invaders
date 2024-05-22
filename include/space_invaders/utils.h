@@ -13,12 +13,11 @@ using Eigen::Array3f;
 const vector<string> generateTexturePaths(const std::string& baseName, int numTextures);
 
 
-template <typename T>
 class RandomNumberGenerator{
 public:
-	RandomNumberGenerator<T>(T maxValue = 100000);
-	void generateNumber(T* numberOut);
+	RandomNumberGenerator();
+	void generateNumber(float* numberOut);
 private:
 	std::mt19937 m_gen;
-	std::uniform_int_distribution<int> m_distribution;
+	std::uniform_real_distribution<> m_distribution;
 };

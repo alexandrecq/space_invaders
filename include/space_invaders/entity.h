@@ -93,7 +93,7 @@ public:
 		const int& numStepsTilReverse,
 		const int& stepEveryTicks = ALIEN_STEP_EVERY_TICKS,
 		const Array2f& stepSize = ALIEN_STEP_SIZE,
-		const int& fireProb = ALIEN_FIRE_PROBABILITY_X100K
+		const float& fireProb = ALIEN_FIRE_PROBABILITY
 	);
 	void update(int ticks) override;
 protected:
@@ -103,8 +103,8 @@ protected:
 private:
 	const int m_numStepsTilReverse;
 	int m_stepsTaken = 0;
-	RandomNumberGenerator<int> m_rng;
-	const int m_fireProbability;
+	RandomNumberGenerator m_rng;
+	const float m_fireProbability;
 };
 
 
@@ -113,6 +113,6 @@ public:
 	Saucer(entityAnimations animations);
 	void update(int ticks) override;
 private:
-	const int m_appearProbability = SAUCER_APPEAR_PROBABILITY_X100K;
-	RandomNumberGenerator<int> m_rng;
+	const float m_appearProbability = SAUCER_APPEAR_PROBABILITY;
+	RandomNumberGenerator m_rng;
 };

@@ -137,7 +137,7 @@ void Player::reset() {
 
 Alien::Alien(const Array2f& widthHeight, const Array2f& position, const Array3f& color, entityAnimations animations,
              const int& numStepsTilReverse,
-             const int& stepEveryTicks, const Array2f& stepSize, const int& fireProb) :
+             const int& stepEveryTicks, const Array2f& stepSize, const float& fireProb) :
     EntityThatFires(widthHeight, position, color, animations, false),
     m_stepEveryTicks(stepEveryTicks), m_stepSize(stepSize), m_numStepsTilReverse(numStepsTilReverse),
     m_fireProbability(fireProb)
@@ -149,7 +149,7 @@ void Alien::update(int ticks)  {
     updateCurrentAnimation(ticks);
     if (!m_active) return;
 
-    int randomNumber;
+    float randomNumber;
     m_rng.generateNumber(&randomNumber);
     if (randomNumber <= m_fireProbability) fire();
 
@@ -181,7 +181,7 @@ void Saucer::update(int ticks)
     if (m_currentAnimation == ENTITY_DEATH_ANIMATION && !m_animations[m_currentAnimation].isDone()) {
         return;
     }
-    int randomNumber;
+    float randomNumber;
     m_rng.generateNumber(&randomNumber);
     if (!m_active && randomNumber <= m_appearProbability) {
         m_active = true;

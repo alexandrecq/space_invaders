@@ -10,18 +10,14 @@ const vector<string> generateTexturePaths(const std::string& baseName, int numTe
 }
 
 
-template class RandomNumberGenerator<int>;
-
-template<typename T>
-RandomNumberGenerator<T>::RandomNumberGenerator(T maxValue) {
+RandomNumberGenerator::RandomNumberGenerator() {
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<int> dist(1, maxValue);
+    std::uniform_real_distribution<> dist(0.0, 1.0);
     m_gen = gen;
     m_distribution = dist;
 }
 
-template<typename T>
-void RandomNumberGenerator<T>::generateNumber(T* numberOut) {
+void RandomNumberGenerator::generateNumber(float* numberOut) {
     *numberOut = m_distribution(m_gen);
 }

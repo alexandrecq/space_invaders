@@ -27,14 +27,14 @@ static const Array2f ALIEN_WIDTH_HEIGHT = {.1, .1};
 static const Array3f ALIEN_COLOR = {.5, 0, .5};
 static const int ALIEN_STEP_EVERY_TICKS = 500;
 static const Array2f ALIEN_STEP_SIZE = {.05, -.05};
-static const int ALIEN_FIRE_PROBABILITY_X100K = 50;
+static const float ALIEN_FIRE_PROBABILITY = .0005f;
 
 // Saucer
 static const Array2f SAUCER_WIDTH_HEIGHT = {.13, .05};
 static const float SAUCER_POS_Y = .85;
 static const int SAUCER_STEP_EVERY_TICKS = 1;
 static const Array2f SAUCER_STEP_SIZE = {.005, 0.};
-static const int SAUCER_APPEAR_PROBABILITY_X100K = 100000;
+static const float SAUCER_APPEAR_PROBABILITY = 1.f;
 
 // Barrier
 static const Array2f TILE_WIDTH_HEIGHT = {.08, .08};
@@ -53,7 +53,7 @@ static const int BARRIER_TOP_RIGHT    = 4;
 //Interface
 static const float INTERFACE_FRAME_THICKNESS = 0.01;
 static const Array2f GAME_CANVAS_BOTTOM_LEFT = {-1, -1};
-static const Array2f GAME_CANVAS_WIDTH_HEIGHT = {2, 1.7};
+static const Array2f GAME_CANVAS_WIDTH_HEIGHT = {2, 1.8};
 
 // Texture paths
 const string RELATIVE_TEXTURE_PATH("../assets/");
