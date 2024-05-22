@@ -3,7 +3,6 @@
 #include <Eigen/Dense>
 
 using Eigen::Array2f;
-using Eigen::Array3f;
 
 class AABB {
 public:

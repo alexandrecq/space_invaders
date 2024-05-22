@@ -72,8 +72,8 @@ void Game::initAlienGrid(
 
 void Game::initSaucer() {
     entityAnimations saucerAnimations{
-        Animation(SAUCER_DEFAULT_TEXTURE_PATHS, false),
-        Animation(SAUCER_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS, false)
+        Animation(SAUCER_DEFAULT_TEXTURE_PATHS, 0, true),
+        Animation(SAUCER_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS)
     };
     auto saucer = std::make_shared<Saucer>(saucerAnimations);
     m_entities.push_back(saucer);
@@ -151,12 +151,10 @@ void Game::run() {
         // printf("Elapsed: %.2ld\n", elapsed_ms.count());
 
         m_interface.startFrame();
-        for (auto entity : m_entities) {
+        for (auto& entity : m_entities) {
             if (entity) {
                 entity->update(elapsed_ms.count());
                 entity->draw(&m_interface);
-
-
             }
         }
         m_interface.renderFrame();
@@ -164,23 +162,23 @@ void Game::run() {
 }
 
 void Game::loadPlayerAnimations(entityAnimations& playerAnimations) {
-    playerAnimations[0] = Animation(PLAYER_DEFAULT_TEXTURE_PATHS);
-    playerAnimations[1] = Animation(PLAYER_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS, false);
+    playerAnimations[0] = Animation(PLAYER_DEFAULT_TEXTURE_PATHS, 0, true);
+    playerAnimations[1] = Animation(PLAYER_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS);
 }
 
 void Game::loadAlienAnimations(std::array<entityAnimations, 3>& alienAnimations) {
-    alienAnimations[0][0] = Animation(ALIEN_A_DEFAULT_TEXTURE_PATHS, ALIEN_STEP_EVERY_TICKS);
-    alienAnimations[1][0] = Animation(ALIEN_B_DEFAULT_TEXTURE_PATHS, ALIEN_STEP_EVERY_TICKS);
-    alienAnimations[2][0] = Animation(ALIEN_C_DEFAULT_TEXTURE_PATHS, ALIEN_STEP_EVERY_TICKS);
-    alienAnimations[0][1] = Animation(ALIEN_A_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS, false);
-    alienAnimations[1][1] = Animation(ALIEN_B_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS, false);
-    alienAnimations[2][1] = Animation(ALIEN_C_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS, false);
+    alienAnimations[0][0] = Animation(ALIEN_A_DEFAULT_TEXTURE_PATHS, ALIEN_STEP_EVERY_TICKS, true);
+    alienAnimations[1][0] = Animation(ALIEN_B_DEFAULT_TEXTURE_PATHS, ALIEN_STEP_EVERY_TICKS, true);
+    alienAnimations[2][0] = Animation(ALIEN_C_DEFAULT_TEXTURE_PATHS, ALIEN_STEP_EVERY_TICKS, true);
+    alienAnimations[0][1] = Animation(ALIEN_A_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS);
+    alienAnimations[1][1] = Animation(ALIEN_B_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS);
+    alienAnimations[2][1] = Animation(ALIEN_C_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS);
 }
 
 void Game::loadBarrierAnimations(barrierAnimations& barrierAnimations) {
-    barrierAnimations[0] = {Animation(BARRIER_A_DEFAULT_TEXTURE_PATHS, false), Animation()};
-    barrierAnimations[1] = {Animation(BARRIER_B_DEFAULT_TEXTURE_PATHS, false), Animation()};
-    barrierAnimations[2] = {Animation(BARRIER_C_DEFAULT_TEXTURE_PATHS, false), Animation()};
-    barrierAnimations[3] = {Animation(BARRIER_D_DEFAULT_TEXTURE_PATHS, false), Animation()};
-    barrierAnimations[4] = {Animation(BARRIER_E_DEFAULT_TEXTURE_PATHS, false), Animation()};
+    barrierAnimations[0] = {Animation(BARRIER_A_DEFAULT_TEXTURE_PATHS), Animation()};
+    barrierAnimations[1] = {Animation(BARRIER_B_DEFAULT_TEXTURE_PATHS), Animation()};
+    barrierAnimations[2] = {Animation(BARRIER_C_DEFAULT_TEXTURE_PATHS), Animation()};
+    barrierAnimations[3] = {Animation(BARRIER_D_DEFAULT_TEXTURE_PATHS), Animation()};
+    barrierAnimations[4] = {Animation(BARRIER_E_DEFAULT_TEXTURE_PATHS), Animation()};
 }

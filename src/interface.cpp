@@ -71,13 +71,15 @@ void Interface::startFrame() const {
     glfwGetFramebufferSize(m_window, &display_w, &display_h);
     glViewport(0, 0, display_w, display_h);
 
+    ImVec4 clear_color = ImVec4(1.f, 1.f, 1.f, .00f);
     // ImVec4 clear_color = ImVec4(0.15f, 0.05f, 0.20f, .50f);
-    ImVec4 clear_color = ImVec4(0.f, 0.f, 0.f, 1.f);
+    // ImVec4 clear_color = ImVec4(0.f, 0.f, 0.f, 1.f);
     glEnable(GL_BLEND);
     glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT);
 
     keyboardEvent();
+    drawOverlay();
 }
 
 void Interface::renderFrame() const {
@@ -86,8 +88,9 @@ void Interface::renderFrame() const {
 }
 
 void Interface::drawRectangle(
-    Eigen::Array2f bottomLeft, Eigen::Array2f widthHeight, Eigen::Array3f color
+    Array2f bottomLeft, Array2f widthHeight, Array3f color, bool globalCanvas
     ) const {
+    if (!globalCanvas) m_gameCanvas.mapFromGlobal(widthHeight, bottomLeft);
     glBegin(GL_QUADS);
     glColor3f(color.x(), color.y(), color.z());
     glVertex2f(bottomLeft.x(), bottomLeft.y());
@@ -123,25 +126,15 @@ void Interface::drawTexture(
 
 void Interface::drawTexture(
     const GLuint textureID,
-    const Eigen::Array2f& bottomLeft, const Eigen::Array2f& widthHeight,
-    const Eigen::Array2f& texBottomLeft, const Eigen::Array2f& texWidthHeight
+    Array2f bottomLeft, Array2f widthHeight,
+    const Array2f& texBottomLeft, const Array2f& texWidthHeight
     ) const {
-    glBindTexture(GL_TEXTURE_2D, textureID);
-    glEnable(GL_TEXTURE_2D);
-    glBegin(GL_QUADS);
-
-    glTexCoord2f(texBottomLeft.x(), texBottomLeft.y() + texWidthHeight.y());
-    glVertex2f(bottomLeft.x(), bottomLeft.y());
-    glTexCoord2f(texBottomLeft.x() + texWidthHeight.x(), texBottomLeft.y() + texWidthHeight.y());
-    glVertex2f(bottomLeft.x() + widthHeight.x(), bottomLeft.y());
-    glTexCoord2f(texBottomLeft.x() + texWidthHeight.x(), texBottomLeft.y());
-    glVertex2f(bottomLeft.x() + widthHeight.x(), bottomLeft.y() + widthHeight.y());
-    glTexCoord2f(texBottomLeft.x(), texBottomLeft.y());
-    glVertex2f(bottomLeft.x(), bottomLeft.y() + widthHeight.y());
-
-    glEnd();
-    glDisable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    m_gameCanvas.mapFromGlobal(widthHeight, bottomLeft);
+    drawTexture(
+        textureID,
+        bottomLeft.x(), bottomLeft.y(), widthHeight.x(), widthHeight.y(),
+        texBottomLeft.x(), texBottomLeft.y(), texWidthHeight.x(), texWidthHeight.y()
+    );
 }
 
 bool Interface::keyboardEvent() const {
@@ -160,6 +153,22 @@ bool Interface::keyboardEvent() const {
     return false;
 }
 
-void Interface::setPlayer(std::shared_ptr<Player> player) {
-    m_player = player;
+void Interface::drawOverlay() const {
+    const float frameThickness = .01;
+    const Array2f frameWidthHeight = m_gameCanvas.m_widthHeight + frameThickness;
+    const Array3f frameColor{1.f, 1.f, 1.f};
+
+    // Frame shape:
+    // |--
+    // | |
+    // --|
+    drawRectangle(m_gameCanvas.m_bottomLeft - Array2f{frameThickness, 0.f},
+                  {frameThickness, frameWidthHeight.y()}, frameColor, true);
+    drawRectangle(m_gameCanvas.m_bottomLeft + Array2f{m_gameCanvas.m_widthHeight.x(), -frameThickness},
+                  {frameThickness, frameWidthHeight.y()}, frameColor, true);
+
+    drawRectangle(m_gameCanvas.m_bottomLeft + Array2f{0.f, m_gameCanvas.m_widthHeight.y()},
+                  {frameWidthHeight.x(), frameThickness}, frameColor, true);
+    drawRectangle(m_gameCanvas.m_bottomLeft - Array2f{frameThickness, frameThickness},
+                  {frameWidthHeight.x(), frameThickness}, frameColor, true);
 }

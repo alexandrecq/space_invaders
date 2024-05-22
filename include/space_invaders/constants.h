@@ -50,6 +50,11 @@ static const int BARRIER_BOTTOM_LEFT  = 2;
 static const int BARRIER_TOP_LEFT     = 3;
 static const int BARRIER_TOP_RIGHT    = 4;
 
+//Interface
+static const float INTERFACE_FRAME_THICKNESS = 0.01;
+static const Array2f GAME_CANVAS_BOTTOM_LEFT = {-1, -1};
+static const Array2f GAME_CANVAS_WIDTH_HEIGHT = {2, 1.7};
+
 // Texture paths
 const string RELATIVE_TEXTURE_PATH("../assets/");
 const vector<string> PLAYER_DEFAULT_TEXTURE_PATHS{ "player_default_0.png" };
