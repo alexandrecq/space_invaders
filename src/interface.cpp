@@ -1,6 +1,7 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include "space_invaders/constants.h"
 
 #include "space_invaders/interface.h"
 
@@ -71,11 +72,8 @@ void Interface::startFrame() const {
     glfwGetFramebufferSize(m_window, &display_w, &display_h);
     glViewport(0, 0, display_w, display_h);
 
-    ImVec4 clear_color = ImVec4(1.f, 1.f, 1.f, .00f);
-    // ImVec4 clear_color = ImVec4(0.15f, 0.05f, 0.20f, .50f);
-    // ImVec4 clear_color = ImVec4(0.f, 0.f, 0.f, 1.f);
     glEnable(GL_BLEND);
-    glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
+    glClearColor(INTERFACE_CLEAR_COLOR.x(), INTERFACE_CLEAR_COLOR.y(), INTERFACE_CLEAR_COLOR.z(), INTERFACE_CLEAR_COLOR.w());
     glClear(GL_COLOR_BUFFER_BIT);
 
     keyboardEvent();
@@ -126,10 +124,10 @@ void Interface::drawTexture(
 
 void Interface::drawTexture(
     const GLuint textureID,
-    Array2f bottomLeft, Array2f widthHeight,
+    Array2f bottomLeft, Array2f widthHeight, bool globalCanvas,
     const Array2f& texBottomLeft, const Array2f& texWidthHeight
     ) const {
-    m_gameCanvas.mapFromGlobal(widthHeight, bottomLeft);
+    if (!globalCanvas) m_gameCanvas.mapFromGlobal(widthHeight, bottomLeft);
     drawTexture(
         textureID,
         bottomLeft.x(), bottomLeft.y(), widthHeight.x(), widthHeight.y(),
@@ -171,4 +169,15 @@ void Interface::drawOverlay() const {
                   {frameWidthHeight.x(), frameThickness}, frameColor, true);
     drawRectangle(m_gameCanvas.m_bottomLeft - Array2f{frameThickness, frameThickness},
                   {frameWidthHeight.x(), frameThickness}, frameColor, true);
+
+    const float dashboardBottomY = GAME_CANVAS_BOTTOM_LEFT.y() + GAME_CANVAS_WIDTH_HEIGHT.y();
+    const float dashboardMidY = (dashboardBottomY + 1) / 2;
+    const float livesOffsetX = .25;
+    for (int life = 0; life < PLAYER_NUM_LIVES; life++) {
+        if (m_player->getNumLives() > life) {
+            drawTexture(m_player->getDefaultAnimation().getCurrentTexture(),
+                        Array2f{livesOffsetX + life * .2, dashboardMidY - m_player->getWidthHeight().y()/2},
+                        m_player->getWidthHeight(), true);
+        }
+    }
 }

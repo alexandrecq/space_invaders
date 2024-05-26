@@ -16,14 +16,12 @@ class Interface;
 
 class Entity {
 public:
-	// Entity() = default;
-	// virtual ~Entity() = default;
 	Entity(Array2f widthHeight, Array2f position, Array3f color);
 	Entity(Array2f widthHeight, Array2f position, Array3f color, entityAnimations animations);
 	virtual void update(int ticks) = 0;
+	virtual void hit();
 	void draw(Interface const *interface) const;
 	AABB aabb() const;
-	virtual void hit();
 
 	void setPosition(Array2f position) { m_position = position; }
 	Array2f getPosition() const { return m_position; }
@@ -31,6 +29,8 @@ public:
 	void setActive(bool active) { m_active = active; }
 	bool isActive() const { return m_active; }
 	void setDrawMe(bool drawMe) { m_drawMe = drawMe; }
+	int getNumLives() { return m_numLives; }
+	Animation getDefaultAnimation() { return m_animations[0]; }
 protected:
 	void updateCurrentAnimation(int ticks);
 	virtual void reset();

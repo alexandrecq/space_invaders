@@ -13,8 +13,8 @@ Animation::Animation(const vector<string> texturePaths, int updateEveryTicks, bo
         checkSingleTextureLoad(path);
         GLuint textureID;
         bool loaded = LoadTextureFromFile((RELATIVE_TEXTURE_PATH + path).c_str(), &textureID);
-        // printf("%s\n", path.c_str());
-        assert(loaded);
+        // throw std::runtime_error{fmt::format("Could not load {}", path};
+        assert(loaded && "Could not load texture file");
         m_textureIDs.push_back(textureID);
     }
 }
@@ -22,6 +22,7 @@ Animation::Animation(const vector<string> texturePaths, int updateEveryTicks, bo
 void Animation::checkSingleTextureLoad(const string texturePath) {
     bool found = (m_loadedTextures.find(texturePath) != m_loadedTextures.end());
     if (found) {
+        // throw std::runtime_error{fmt::format("Could not load {}", path};
         printf("texture %s is already loaded\n", texturePath.c_str());
         assert(false);
     }

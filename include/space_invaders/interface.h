@@ -45,7 +45,7 @@ public:
 	) const;
 	void drawTexture(
 		const GLuint textureID,
-		Array2f bottomLeft, Array2f widthHeight,
+		Array2f bottomLeft, Array2f widthHeight, bool globalCanvas = false,
 		const Array2f& texBottomLeft = {0., 0.}, const Array2f& texWidthHeight = {1., 1.}
 	) const;
 private:

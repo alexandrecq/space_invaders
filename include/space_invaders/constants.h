@@ -54,6 +54,7 @@ static const int BARRIER_TOP_RIGHT    = 4;
 static const float INTERFACE_FRAME_THICKNESS = 0.01;
 static const Array2f GAME_CANVAS_BOTTOM_LEFT = {-1, -1};
 static const Array2f GAME_CANVAS_WIDTH_HEIGHT = {2, 1.8};
+static const Eigen::Array4f INTERFACE_CLEAR_COLOR = {0.15f, 0.05f, 0.20f, .90f};
 
 // Texture paths
 const string RELATIVE_TEXTURE_PATH("../assets/");

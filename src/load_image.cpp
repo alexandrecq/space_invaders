@@ -18,11 +18,11 @@ bool LoadTextureFromFile(const char* filename, GLuint* out_texture, int* out_wid
     // printf("%d, %d, %d\n", image_width, image_height, num_channels);
     // int values_per_row = image_width * num_channels;
     // unsigned char* data_ptr = image_data;
-    // for (int i = 0; i < image_width; i++){
-    //     for (int j = 0; j < image_height; j++){
+    // for (int x = 0; x < image_width; x++){
+    //     for (int y = 0; y < image_height; y++){
     //         printf("(");
     //         for (int c = 0; c < num_channels; c++){
-    //             printf("%02d, ", *data_ptr);
+    //             printf("%02x, ", *data_ptr);
     //             data_ptr++;
     //         }
     //         printf(") ");
@@ -35,6 +35,9 @@ bool LoadTextureFromFile(const char* filename, GLuint* out_texture, int* out_wid
     GLint internal_format = (num_channels > 3) ? GL_RGBA : GL_RGB;
     glGenTextures(1, &texture_id);
     glBindTexture(GL_TEXTURE_2D, texture_id);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Setup filtering parameters for display
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
