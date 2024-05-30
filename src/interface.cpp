@@ -2,7 +2,8 @@
 #include "imgui_impl_opengl3.h"
 
 #include "space_invaders/interface.h"
-#include <string>
+#include "space_invaders/entity.h"
+#include "space_invaders/game.h"
 
 Interface::Interface() {
     glfwSetErrorCallback(glfw_error_callback);
@@ -26,7 +27,6 @@ Interface::Interface() {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
@@ -96,12 +96,6 @@ void Interface::startFrame() {
 }
 
 void Interface::renderFrame() const {
-
-    // ImGui::PushFont(m_fontHeading);
-    // drawRectangle({-1, -1}, {2., 2.}, {.1, .1, .1, .5}, true);
-    // const ImVec2 pos(.5 * m_windowWidthHeight.x(), .5 * m_windowWidthHeight.y());
-    // ImGui::GetForegroundDrawList()->AddText(pos, ImColor(1.0f, 1.0f, 1.0f, 1.0f), "GAME OVER!");
-    // ImGui::PopFont();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -173,6 +167,9 @@ bool Interface::keyboardEvent() const {
     if (ImGui::IsKeyPressed(ImGuiKey_W)) {
         m_player->fire();
     }
+    if (ImGui::IsKeyPressed(ImGuiKey_P)) {
+        m_game->togglePause();
+    }
     return false;
 }
 
@@ -199,13 +196,18 @@ void Interface::drawOverlay() const {
     // draw frame around game canvas
     drawFrame(m_gameCanvas.m_bottomLeft, m_gameCanvas.m_widthHeight, frameThickness);
     // draw frame around dashboard
-    drawFrame(m_gameCanvas.m_bottomLeft + Array2f{0.f, m_gameCanvas.m_widthHeight.y() + frameThickness},
-              Array2f{m_gameCanvas.m_widthHeight.x(), 2 - m_gameCanvas.m_widthHeight.y() - 3*frameThickness}, frameThickness);
+    const Array2f dashboardBL = m_gameCanvas.m_bottomLeft + Array2f{0.f, m_gameCanvas.m_widthHeight.y() + 2 * frameThickness};
+    const Array2f dashboardWH = Array2f{m_gameCanvas.m_widthHeight.x(), 2 - m_gameCanvas.m_widthHeight.y() - 4 * frameThickness};
+    drawFrame(dashboardBL, dashboardWH, frameThickness);
 
     ImGui::PushFont(m_fontBody);
-    const float textLineY = 1.98;
-    const ImVec2 livesPosXY(.5 * m_windowWidthHeight.x(), (2 - textLineY) * m_windowWidthHeight.y());
+    // top left corner of text box (x right, y down)
+    const ImVec2 scorePosXY(.1 * m_windowWidthHeight.x(), (2 - DASHBOARD_TEXT_Y) * m_windowWidthHeight.y());
+    std::string scoreLine = "SCORE:\t" + std::to_string(*m_player->getScore());
+    ImGui::GetForegroundDrawList()->AddText(scorePosXY, ImColor(1.0f, 1.0f, 1.0f, 1.0f), scoreLine.c_str());
+    const ImVec2 livesPosXY(.5 * m_windowWidthHeight.x(), (2 - DASHBOARD_TEXT_Y) * m_windowWidthHeight.y());
     ImGui::GetForegroundDrawList()->AddText(livesPosXY, ImColor(1.0f, 1.0f, 1.0f, 1.0f), "LIVES:\t");
+    ImGui::PopFont();
 
     const float dashboardBottomY = GAME_CANVAS_BOTTOM_LEFT.y() + GAME_CANVAS_WIDTH_HEIGHT.y();
     const float dashboardMidY = (dashboardBottomY + 1) / 2;
@@ -213,15 +215,18 @@ void Interface::drawOverlay() const {
     for (int life = 0; life < PLAYER_NUM_LIVES; life++) {
         if (m_player->getNumLives() > life) {
             drawTexture(m_player->getDefaultAnimation().getCurrentTexture(),
-                        Array2f{livesOffsetX + life * .2, dashboardMidY - m_player->getWidthHeight().y()/2},
+                        Array2f{livesOffsetX + life * .2, dashboardMidY - m_player->getWidthHeight().y() / 2},
                         m_player->getWidthHeight(), true);
         }
     }
+}
 
-    // top left corner of text box (x right, y down)
-    const ImVec2 scorePosXY(.1 * m_windowWidthHeight.x(), (2 - textLineY) * m_windowWidthHeight.y());
-    std::string scoreLine = "SCORE:\t" + std::to_string(*m_player->getScore());
-    ImGui::GetForegroundDrawList()->AddText(scorePosXY, ImColor(1.0f, 1.0f, 1.0f, 1.0f), scoreLine.c_str());
+void Interface::displayGameOverScreen() {
+
+    ImGui::PushFont(m_fontHeading);
+    drawRectangle({-1, -1}, {2., 2.}, {.1, .1, .1, .9}, true);
+    const ImVec2 pos(.31 * m_windowWidthHeight.x(), .4 * m_windowWidthHeight.y());
+    ImGui::GetForegroundDrawList()->AddText(pos, ImColor(1.0f, 1.0f, 1.0f, 1.0f), "GAME OVER!");
     ImGui::PopFont();
 
 }

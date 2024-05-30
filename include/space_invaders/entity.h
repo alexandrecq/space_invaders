@@ -1,13 +1,11 @@
 #pragma once
 
-#include <memory>
 #include <array>
 
 #include "space_invaders/aabb.h"
 #include "space_invaders/animation.h"
 #include "space_invaders/constants.h"
 
-using std::shared_ptr;
 using entityAnimations = std::array<Animation, 2>;
 using barrierAnimations = std::array<entityAnimations, 5>;
 

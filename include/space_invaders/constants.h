@@ -25,7 +25,7 @@ static const int PLAYER_DEATH_SLEEP_MS = 1000;
 static const Array2f ALIEN_WIDTH_HEIGHT = {.1, .1};
 static const int ALIEN_STEP_EVERY_TICKS = 500;
 static const Array2f ALIEN_STEP_SIZE = {.05, -.05};
-static const float ALIEN_FIRE_PROBABILITY = .0005f;
+static const float ALIEN_FIRE_PROBABILITY = .5f;
 static const int ALIEN_A_HIT_VALUE = 10;
 static const int ALIEN_B_HIT_VALUE = 20;
 static const int ALIEN_C_HIT_VALUE = 40;
@@ -56,8 +56,9 @@ static const float INTERFACE_FRAME_THICKNESS = 0.01;
 static const Array2f GAME_CANVAS_BOTTOM_LEFT = {-1, -1};
 static const Array2f GAME_CANVAS_WIDTH_HEIGHT = {2, 1.8};
 static const Array4f INTERFACE_CLEAR_COLOR = {0.15f, 0.05f, 0.20f, .90f};
-static const float FONT_SIZE_HEADING = 100;
+static const float FONT_SIZE_HEADING = 150;
 static const float FONT_SIZE_BODY = 50;
+static const float DASHBOARD_TEXT_Y = 1.98;
 
 // Texture paths
 const string ASSETS_RELATIVE_PATH("../assets/");

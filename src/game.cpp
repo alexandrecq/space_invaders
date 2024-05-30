@@ -1,13 +1,17 @@
 #include <array>
+#include <memory>
 #include <thread>
 
 #include "space_invaders/constants.h"
 #include "space_invaders/entity.h"
 #include "space_invaders/game.h"
+#include "space_invaders/interface.h"
 
 
 Game::Game() {
     m_startTime = std::chrono::steady_clock::now();
+    m_interface = std::make_shared<Interface>();
+    m_interface->setGame(this);
 
     initPlayer();
     initAlienGrid();
@@ -25,7 +29,7 @@ void Game::initPlayer() {
 
     m_player = std::make_shared<Player>(PLAYER_WIDTH_HEIGHT, PLAYER_START_POSITION, playerAnimations);
     m_entities.push_back(m_player);
-    m_interface.setPlayer(m_player);
+    m_interface->setPlayer(m_player);
 
     m_entities.push_back(m_player->getProjectile());
 }
@@ -146,20 +150,27 @@ void Game::setAlienTargets() {
 }
 
 void Game::run() {
-    while (m_interface.isAlive()) {
+    while (m_interface->isAlive()) {
         std::this_thread::sleep_for(std::chrono::milliseconds(m_tickMS));
         auto elapsed = std::chrono::steady_clock::now() - m_startTime;
         auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed);
         // printf("Elapsed: %.2ld\n", elapsed_ms.count());
 
-        m_interface.startFrame();
+        m_interface->startFrame();
+
         for (auto& entity : m_entities) {
-            if (entity) {
-                entity->update(elapsed_ms.count());
-                entity->draw(&m_interface);
-            }
+            if (!entity) continue;
+            if (!m_paused) entity->update(elapsed_ms.count());
+            entity->draw(m_interface.get());
         }
-        m_interface.renderFrame();
+
+        if (m_player->getNumLives() <= 0) {
+            m_paused = true;
+            m_interface->displayGameOverScreen();
+        } else if (m_paused) {
+            // m_interface->displayPausedScreen();
+        }
+        m_interface->renderFrame();
     }
 }
 

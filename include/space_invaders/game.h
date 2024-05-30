@@ -4,13 +4,14 @@
 
 #include "space_invaders/constants.h"
 #include "space_invaders/entity.h"
-#include "space_invaders/interface.h"
 
+class Interface;
 
 class Game {
 public:
 	Game();
 	void run();
+	void togglePause() { m_paused = !m_paused; }
 private:
 	void initPlayer();
 	void initAlienGrid(
@@ -30,11 +31,12 @@ private:
 	void loadAlienAnimations(std::array<entityAnimations, 3>& alienAnimations);
 	void loadBarrierAnimations(barrierAnimations& barrierAnimations);
 
-	Interface m_interface;
+	shared_ptr<Interface> m_interface;
 	shared_ptr<Player> m_player;
 	vector<shared_ptr<Entity>> m_entities;
 	vector<shared_ptr<Alien>> m_aliens;
 	vector<shared_ptr<Entity>> m_barriers;
+	bool m_paused = false;
 
 	std::chrono::time_point<std::chrono::steady_clock> m_startTime;
 	const int m_tickMS = GAME_TICK_MS;

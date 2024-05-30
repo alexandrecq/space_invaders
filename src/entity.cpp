@@ -189,7 +189,16 @@ void Saucer::update(int ticks)
         m_active = true;
         m_drawMe = true;
         m_numLives = 1;
-        m_position = {-1 - m_widthHeight.x() / 2, SAUCER_POS_Y};
+        int& randomInt = reinterpret_cast<int&>(randomNumber);
+        if (randomInt % 2 == 0) {
+            // travel from left to right
+            m_position = {-1 - m_widthHeight.x() / 2, SAUCER_POS_Y};
+            m_stepSize = abs(m_stepSize);
+        } else {
+            // travel from left to right
+            m_position = {1 + m_widthHeight.x() / 2, SAUCER_POS_Y};
+            m_stepSize = abs(m_stepSize) * -1;
+        }
     }
     if (!m_active) return;
 

@@ -1,10 +1,13 @@
 #pragma once
 
+
+#include <memory>
 #include <random>
 #include <string>
 #include <vector>
 #include <Eigen/Dense>
 
+using std::shared_ptr;
 using std::string;
 using std::vector;
 using Eigen::Array2f;

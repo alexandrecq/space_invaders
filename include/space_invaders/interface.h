@@ -1,10 +1,15 @@
 #pragma once
 
 #include "imgui.h"
+#include <memory>
 #define GL_SILENCE_DEPRECATION
 #include <GLFW/glfw3.h> // Will drag system OpenGL headers
 
-#include "space_invaders/entity.h"
+#include "space_invaders/common.h"
+#include "space_invaders/constants.h"
+
+class Game;
+class Player;
 
 static void glfw_error_callback(int error, const char* description)
 {
@@ -31,6 +36,7 @@ public:
 	bool isAlive() const;
 	void drawRectangle(Array2f bottomLeft, Array2f widthHeight,
 		    const Array4f& color = {1.f, 1.f, 1.f, 1.f}, bool globalCanvas = false) const;
+	void setGame(Game *game) { m_game = game; }
 	void setPlayer(std::shared_ptr<Player> player) { m_player = player; }
 	void drawTexture(
 		const GLuint textureID,
@@ -42,6 +48,7 @@ public:
 		Array2f bottomLeft, Array2f widthHeight, bool globalCanvas = false,
 		const Array2f& texBottomLeft = {0.f, 0.f}, const Array2f& texWidthHeight = {1.f, 1.f}
 	) const;
+	void displayGameOverScreen();
 private:
 	bool keyboardEvent() const;
 	void drawOverlay() const;
@@ -49,6 +56,7 @@ private:
 		const Array4f& color = {1.f, 1.f, 1.f, 1.f}
 	) const;
 
+	Game *m_game;
 	std::shared_ptr<Player> m_player;
 	GLFWwindow* m_window = nullptr;
 	Eigen::Array2i m_windowWidthHeight;
