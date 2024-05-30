@@ -7,6 +7,7 @@
 #include "space_invaders/constants.h"
 
 using entityAnimations = std::array<Animation, 2>;
+using alienAnimations = std::array<entityAnimations, 3>;
 using barrierAnimations = std::array<entityAnimations, 5>;
 
 class Interface;

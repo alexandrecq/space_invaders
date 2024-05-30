@@ -154,6 +154,7 @@ void Alien::update(int ticks)  {
     m_rng.generateNumber(&randomNumber);
     if (randomNumber <= m_fireProbability) fire();
 
+    printf("ticks: %d, m_lastStepTick: %d, m_stepEveryTicks: %d\n", ticks, m_lastStepTick, m_stepEveryTicks);
     if (ticks - m_lastStepTick > m_stepEveryTicks) {
         if (m_stepsTaken == m_numStepsTilReverse) {
             m_position.y() += m_stepSize.y();

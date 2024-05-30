@@ -12,6 +12,17 @@ Game::Game() {
     m_startTime = std::chrono::steady_clock::now();
     m_interface = std::make_shared<Interface>();
     m_interface->setGame(this);
+    reset();
+}
+
+void Game::reset() {
+    m_paused = false;
+    m_gameOver = false;
+
+    m_player = nullptr;
+    m_entities.clear();
+    m_aliens.clear();
+    m_barriers.clear();
 
     initPlayer();
     initAlienGrid();
@@ -20,12 +31,10 @@ Game::Game() {
 
     setPlayerTargets();
     setAlienTargets();
-
 }
 
 void Game::initPlayer() {
-    entityAnimations playerAnimations;
-    loadPlayerAnimations(playerAnimations);
+    entityAnimations& playerAnimations = loadPlayerAnimations();
 
     m_player = std::make_shared<Player>(PLAYER_WIDTH_HEIGHT, PLAYER_START_POSITION, playerAnimations);
     m_entities.push_back(m_player);
@@ -39,8 +48,7 @@ void Game::initAlienGrid(
 ) {
     const Array2f gridIncXY = 1.5 * alienWidthHeight;
     const Array2f stepSize = {alienWidthHeight.x() / 2, -alienWidthHeight.y() / 2};
-    std::array<entityAnimations, 3> allAlienAnimations;
-    loadAlienAnimations(allAlienAnimations);
+    alienAnimations& allAlienAnimations = loadAlienAnimations();
 
     const Array2f colsRows{numCols, numRows};
     const Array2f gridOuterDims = (colsRows * alienWidthHeight)
@@ -77,10 +85,7 @@ void Game::initAlienGrid(
 }
 
 void Game::initSaucer() {
-    entityAnimations saucerAnimations{
-        Animation(SAUCER_DEFAULT_TEXTURE_PATHS, 0, true),
-        Animation(SAUCER_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS)
-    };
+    entityAnimations& saucerAnimations = loadSaucerAnimations();
     auto saucer = std::make_shared<Saucer>(saucerAnimations);
     m_entities.push_back(saucer);
     m_aliens.push_back(saucer);
@@ -125,8 +130,7 @@ void Game::initBarriers(const int numBarriers) {
     const float incX = barrierWidth + gapWidth;
     const float firstBarrierX = -1 + gapWidth + barrierWidth / 2.f;
 
-    barrierAnimations allBarrierAnimations;
-    loadBarrierAnimations(allBarrierAnimations);
+    barrierAnimations& allBarrierAnimations = loadBarrierAnimations();
     Array2f barrierPosition = {firstBarrierX, BARRIER_POS_Y};
     for (int idx = 0; idx < numBarriers; idx++) {
         initBarrierTiles(barrierPosition, allBarrierAnimations);
@@ -149,28 +153,6 @@ void Game::setAlienTargets() {
     }
 }
 
-void Game::loadPlayerAnimations(entityAnimations& playerAnimations) {
-    playerAnimations[0] = Animation(PLAYER_DEFAULT_TEXTURE_PATHS, 0, true);
-    playerAnimations[1] = Animation(PLAYER_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS);
-}
-
-void Game::loadAlienAnimations(std::array<entityAnimations, 3>& alienAnimations) {
-    alienAnimations[0][0] = Animation(ALIEN_A_DEFAULT_TEXTURE_PATHS, ALIEN_STEP_EVERY_TICKS, true);
-    alienAnimations[1][0] = Animation(ALIEN_B_DEFAULT_TEXTURE_PATHS, ALIEN_STEP_EVERY_TICKS, true);
-    alienAnimations[2][0] = Animation(ALIEN_C_DEFAULT_TEXTURE_PATHS, ALIEN_STEP_EVERY_TICKS, true);
-    alienAnimations[0][1] = Animation(ALIEN_A_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS);
-    alienAnimations[1][1] = Animation(ALIEN_B_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS);
-    alienAnimations[2][1] = Animation(ALIEN_C_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS);
-}
-
-void Game::loadBarrierAnimations(barrierAnimations& barrierAnimations) {
-    barrierAnimations[0] = {Animation(BARRIER_A_DEFAULT_TEXTURE_PATHS), Animation()};
-    barrierAnimations[1] = {Animation(BARRIER_B_DEFAULT_TEXTURE_PATHS), Animation()};
-    barrierAnimations[2] = {Animation(BARRIER_C_DEFAULT_TEXTURE_PATHS), Animation()};
-    barrierAnimations[3] = {Animation(BARRIER_D_DEFAULT_TEXTURE_PATHS), Animation()};
-    barrierAnimations[4] = {Animation(BARRIER_E_DEFAULT_TEXTURE_PATHS), Animation()};
-}
-
 void Game::run() {
     while (m_interface->isAlive()) {
         std::this_thread::sleep_for(std::chrono::milliseconds(m_tickMS));
@@ -182,12 +164,12 @@ void Game::run() {
 
         for (auto& entity : m_entities) {
             if (!entity) continue;
-            if (!m_paused) entity->update(elapsed_ms.count());
+            if (!m_gameOver && !m_paused) entity->update(elapsed_ms.count());
             entity->draw(m_interface.get());
         }
 
-        if (m_player->getNumLives() <= 10) {
-            m_paused = true;
+        if (m_player->getNumLives() <= 0) {
+            m_gameOver = true;
             m_interface->displayGameOverScreen();
         } else if (m_paused) {
             // m_interface->displayPausedScreen();
@@ -196,3 +178,48 @@ void Game::run() {
     }
 }
 
+
+entityAnimations& loadPlayerAnimations() {
+    static entityAnimations playerAnimations{
+        Animation(PLAYER_DEFAULT_TEXTURE_PATHS, 0, true),
+        Animation(PLAYER_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS)
+    };
+    return playerAnimations;
+}
+
+entityAnimations& loadSaucerAnimations() {
+    static entityAnimations saucerAnimations{
+        Animation(SAUCER_DEFAULT_TEXTURE_PATHS, 0, true),
+        Animation(SAUCER_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS)
+    };
+    return saucerAnimations;
+}
+
+alienAnimations& loadAlienAnimations() {
+    static alienAnimations allAlienAnimations{
+        entityAnimations{
+            Animation(ALIEN_A_DEFAULT_TEXTURE_PATHS, ALIEN_STEP_EVERY_TICKS, true),
+            Animation(ALIEN_A_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS)
+        },
+        entityAnimations{
+            Animation(ALIEN_B_DEFAULT_TEXTURE_PATHS, ALIEN_STEP_EVERY_TICKS, true),
+            Animation(ALIEN_B_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS)
+        },
+        entityAnimations{
+            Animation(ALIEN_C_DEFAULT_TEXTURE_PATHS, ALIEN_STEP_EVERY_TICKS, true),
+            Animation(ALIEN_C_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS)
+        }
+    };
+    return allAlienAnimations;
+}
+
+barrierAnimations& loadBarrierAnimations() {
+    static barrierAnimations allBarrierAnimations{
+        entityAnimations{Animation(BARRIER_A_DEFAULT_TEXTURE_PATHS), Animation()},
+        entityAnimations{Animation(BARRIER_B_DEFAULT_TEXTURE_PATHS), Animation()},
+        entityAnimations{Animation(BARRIER_C_DEFAULT_TEXTURE_PATHS), Animation()},
+        entityAnimations{Animation(BARRIER_D_DEFAULT_TEXTURE_PATHS), Animation()},
+        entityAnimations{Animation(BARRIER_E_DEFAULT_TEXTURE_PATHS), Animation()}
+    };
+    return allBarrierAnimations;
+}

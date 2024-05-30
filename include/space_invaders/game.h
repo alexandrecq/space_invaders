@@ -12,6 +12,7 @@ public:
 	Game();
 	void run();
 	void togglePause() { m_paused = !m_paused; }
+	void reset();
 private:
 	void initPlayer();
 	void initAlienGrid(
@@ -27,9 +28,6 @@ private:
 	void initBarriers(const int numBarriers = GAME_NUM_BARRIERS);
 	void setPlayerTargets();
 	void setAlienTargets();
-	void loadPlayerAnimations(entityAnimations& playerAnimations);
-	void loadAlienAnimations(std::array<entityAnimations, 3>& alienAnimations);
-	void loadBarrierAnimations(barrierAnimations& barrierAnimations);
 
 	shared_ptr<Interface> m_interface;
 	shared_ptr<Player> m_player;
@@ -37,7 +35,13 @@ private:
 	vector<shared_ptr<Alien>> m_aliens;
 	vector<shared_ptr<Entity>> m_barriers;
 	bool m_paused = false;
+	bool m_gameOver = false;
 
 	std::chrono::time_point<std::chrono::steady_clock> m_startTime;
 	const int m_tickMS = GAME_TICK_MS;
 };
+
+entityAnimations& loadPlayerAnimations();
+entityAnimations& loadSaucerAnimations();
+alienAnimations& loadAlienAnimations();
+barrierAnimations& loadBarrierAnimations();

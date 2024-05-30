@@ -155,6 +155,8 @@ bool Interface::keyboardEvent() const {
         m_player->fire();
     if (ImGui::IsKeyPressed(ImGuiKey_P))
         m_game->togglePause();
+    if (ImGui::IsKeyPressed(ImGuiKey_R))
+        m_game->reset();
     return false;
 }
 
@@ -187,18 +189,17 @@ void Interface::drawOverlay() const {
     // draw score and lives
     ImGui::PushFont(m_fontBody);
     std::string scoreText = "SCORE:\t" + std::to_string(*m_player->getScore());
-    auto textWidth = ImGui::CalcTextSize(scoreText.c_str()).x;
-    auto textHeight = ImGui::CalcTextSize(scoreText.c_str()).y;
+    ImVec2 textSize = ImGui::CalcTextSize(scoreText.c_str());
     Array2f dashboardWH_imgui = dashboardWH * m_windowWidthHeight.cast<float>() / 2;
     // Array2f dashboardTL_imgui = Array2f{borderThickness, borderThickness} * m_windowWidthHeight.cast<float>() / 2;
     ImVec2 scorePos{
-        (dashboardWH_imgui.x() - textWidth) * 0.1f,
-        (dashboardWH_imgui.y() - textHeight) * 0.5f
+        (dashboardWH_imgui.x() - textSize.x) * 0.1f,
+        (dashboardWH_imgui.y() - textSize.y) * 0.5f
     };
     ImGui::GetBackgroundDrawList()->AddText(scorePos, ImColor(1.0f, 1.0f, 1.0f, 1.0f), scoreText.c_str());
     ImVec2 livesPos{
-        (dashboardWH_imgui.x() - textWidth) * 0.6f,
-        (dashboardWH_imgui.y() - textHeight) * 0.5f
+        (dashboardWH_imgui.x() - textSize.x) * 0.6f,
+        (dashboardWH_imgui.y() - textSize.y) * 0.5f
     };
     ImGui::GetBackgroundDrawList()->AddText(livesPos, ImColor(1.0f, 1.0f, 1.0f, 1.0f), "LIVES:\t");
     ImGui::PopFont();
@@ -227,19 +228,17 @@ void Interface::displayGameOverScreen() {
 
         ImGui::PushFont(m_fontHeading);
         string text{"GAME OVER!"};
-        auto textWidth = ImGui::CalcTextSize(text.c_str()).x;
-        auto textHeight = ImGui::CalcTextSize(text.c_str()).y;
-        ImGui::SetCursorPosX((windowWidth - textWidth) * 0.5f);
-        ImGui::SetCursorPosY((windowHeight - textHeight) * 0.25f);
+        ImVec2 textSize = ImGui::CalcTextSize(text.c_str());
+        ImGui::SetCursorPosX((windowWidth - textSize.x) * 0.5f);
+        ImGui::SetCursorPosY((windowHeight - textSize.y) * 0.25f);
         ImGui::Text("%s", text.c_str());
         ImGui::PopFont();
 
         ImGui::PushFont(m_fontBody);
         text = "[R]estart?";
-        textWidth = ImGui::CalcTextSize(text.c_str()).x;
-        textHeight = ImGui::CalcTextSize(text.c_str()).y;
-        ImGui::SetCursorPosX((windowWidth - textWidth) * 0.5f);
-        ImGui::SetCursorPosY((windowHeight - textHeight) * 0.5f);
+        textSize = ImGui::CalcTextSize(text.c_str());
+        ImGui::SetCursorPosX((windowWidth - textSize.x) * 0.5f);
+        ImGui::SetCursorPosY((windowHeight - textSize.y) * 0.5f);
         ImGui::Text("%s", text.c_str());
         ImGui::PopFont();
 
