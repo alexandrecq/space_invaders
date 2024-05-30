@@ -8,6 +8,7 @@
 using Eigen::Array2f;
 using Eigen::Array2f;
 
+#include "imgui.h"
 #define GL_SILENCE_DEPRECATION
 #include <GLFW/glfw3.h> // Will drag system OpenGL headers
 
@@ -33,7 +34,7 @@ class Interface {
 public:
 	Interface();
 	~Interface();
-	void startFrame() const;
+	void startFrame();
 	void renderFrame() const;
 	bool isAlive() const;
 	void drawRectangle(Array2f bottomLeft, Array2f widthHeight, Array3f color = {1., 1., 1.}, bool globalCanvas = false) const;
@@ -54,9 +55,13 @@ private:
 
 	std::shared_ptr<Player> m_player;
 	GLFWwindow* m_window = nullptr;
-	vector<GLuint> m_textureIDs{2};
+	Eigen::Array2i m_windowWidthHeight;
+	ImFont* m_fontBody;
+	ImFont* m_fontHeading;
 	const Canvas m_gameCanvas = Canvas(
 		GAME_CANVAS_BOTTOM_LEFT + INTERFACE_FRAME_THICKNESS,
 		GAME_CANVAS_WIDTH_HEIGHT - 2 * INTERFACE_FRAME_THICKNESS
 	);
+
+	void updateWindowSize() { glfwGetWindowSize(m_window, &m_windowWidthHeight.x(), &m_windowWidthHeight.y()); }
 };

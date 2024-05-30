@@ -12,7 +12,7 @@ Animation::Animation(const vector<string> texturePaths, int updateEveryTicks, bo
     for (auto& path : texturePaths) {
         checkSingleTextureLoad(path);
         GLuint textureID;
-        bool loaded = LoadTextureFromFile((RELATIVE_TEXTURE_PATH + path).c_str(), &textureID);
+        bool loaded = LoadTextureFromFile((ASSETS_RELATIVE_PATH + path).c_str(), &textureID);
         // throw std::runtime_error{fmt::format("Could not load {}", path};
         assert(loaded && "Could not load texture file");
         m_textureIDs.push_back(textureID);

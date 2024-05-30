@@ -25,14 +25,15 @@ AABB Entity::aabb() const {
     return AABB(m_position - m_widthHeight / 2, m_position + m_widthHeight / 2);
 }
 
-void Entity::hit() {
-    if (!m_active) return;  // can't be hit while dying or dead
+int Entity::hit() {
+    if (!m_active) return 0;  // can't be hit while dying or dead
     m_numLives--;
     if (!m_animations[ENTITY_DEATH_ANIMATION].isEmpty()) {
         m_animations[ENTITY_DEATH_ANIMATION].reset();
         m_currentAnimation = ENTITY_DEATH_ANIMATION;
     }
     m_active = false;
+    return m_hitValue;
 }
 
 void Entity::updateCurrentAnimation(int ticks) {
@@ -54,14 +55,15 @@ BarrierTile::BarrierTile(Array2f widthHeight, Array2f position, Array3f color, e
 
 void BarrierTile::update(int ticks)  {}
 
-void BarrierTile::hit() {
-    if (!m_active) return;
+int BarrierTile::hit() {
+    if (!m_active) return 0;
     m_numLives--;
     m_animations[m_currentAnimation].updateTexture();
     if (m_animations[m_currentAnimation].isDone() || m_numLives == 0) {
         m_active = false;
         m_drawMe = false;
     }
+    return m_hitValue;
 }
 
 
@@ -80,7 +82,7 @@ void Projectile::update(int ticks)  {
             if (aabb().intersects(target->aabb())) {
                 m_active = false;
                 m_drawMe = false;
-                target->hit();
+                m_totalHits += target->hit();
             }
         }
     }
@@ -143,6 +145,7 @@ Alien::Alien(const Array2f& widthHeight, const Array2f& position, const Array3f&
     m_fireProbability(fireProb)
 {
     m_stepsTaken = numStepsTilReverse / 2;  //grid starts at center of screen
+    m_hitValue = 100;
 }
 
 void Alien::update(int ticks)  {

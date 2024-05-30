@@ -6,7 +6,6 @@
 #include "space_invaders/aabb.h"
 #include "space_invaders/animation.h"
 #include "space_invaders/constants.h"
-#include "space_invaders/utils.h"
 
 using std::shared_ptr;
 using entityAnimations = std::array<Animation, 2>;
@@ -19,7 +18,7 @@ public:
 	Entity(Array2f widthHeight, Array2f position, Array3f color);
 	Entity(Array2f widthHeight, Array2f position, Array3f color, entityAnimations animations);
 	virtual void update(int ticks) = 0;
-	virtual void hit();
+	virtual int hit();
 	void draw(Interface const *interface) const;
 	AABB aabb() const;
 
@@ -36,6 +35,8 @@ protected:
 	virtual void reset();
 
 	const Array2f m_widthHeight{.01, .01};
+	// const int m_hitValue = 0;
+	int m_hitValue = 0;
 	Array2f m_position;
 	Array3f m_color;
 	entityAnimations m_animations;
@@ -51,7 +52,7 @@ public:
 	BarrierTile(Array2f widthHeight, Array2f position, Array3f color, entityAnimations animations);
 	void update(int ticks) override;
 protected:
-	void hit() override;
+	int hit() override;
 };
 
 
@@ -60,9 +61,11 @@ public:
 	Projectile(Array2f widthHeight, Array2f position, Array3f color, float m_vertStepSize);
 	void update(int ticks) override;
 	void setTargets(vector<shared_ptr<Entity>> targets) { m_targets = targets; }
+	long long const* getTotalHits() const { return &m_totalHits; }
 private:
 	float m_vertStepSize;
 	vector<shared_ptr<Entity>> m_targets;
+	long long m_totalHits;
 };
 
 
@@ -84,6 +87,7 @@ public:
 	void update(int ticks) override;
 	void takeStep(bool toTheRight);
 	void reset() override;
+	long long const* getScore() { return m_projectile->getTotalHits(); }
 };
 
 

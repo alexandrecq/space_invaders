@@ -55,9 +55,11 @@ static const float INTERFACE_FRAME_THICKNESS = 0.01;
 static const Array2f GAME_CANVAS_BOTTOM_LEFT = {-1, -1};
 static const Array2f GAME_CANVAS_WIDTH_HEIGHT = {2, 1.8};
 static const Eigen::Array4f INTERFACE_CLEAR_COLOR = {0.15f, 0.05f, 0.20f, .90f};
+static const float FONT_SIZE_HEADING = 100;
+static const float FONT_SIZE_BODY = 50;
 
 // Texture paths
-const string RELATIVE_TEXTURE_PATH("../assets/");
+const string ASSETS_RELATIVE_PATH("../assets/");
 const vector<string> PLAYER_DEFAULT_TEXTURE_PATHS{ "player_default_0.png" };
 const vector<string> PLAYER_DEATH_TEXTURE_PATHS = generateTexturePaths("player_death_", 6);
 const vector<string> ALIEN_A_DEFAULT_TEXTURE_PATHS = generateTexturePaths("alien_a_walk_", 2);

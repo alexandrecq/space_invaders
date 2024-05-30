@@ -11,7 +11,7 @@ Game::Game() {
 
     initPlayer();
     initAlienGrid();
-    // initBarriers();
+    initBarriers();
     initSaucer();
 
     setPlayerTargets();

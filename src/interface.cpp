@@ -1,7 +1,7 @@
-#include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "space_invaders/constants.h"
+#include <string>
 
 #include "space_invaders/interface.h"
 
@@ -16,7 +16,7 @@ Interface::Interface() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
     // Create window with graphics context
-    m_window = glfwCreateWindow(1000, 1000, "Space Invaders", nullptr, nullptr);
+    m_window = glfwCreateWindow(1200, 1000, "Space Invaders", nullptr, nullptr);
     if (m_window == nullptr)
         return;
     glfwMakeContextCurrent(m_window);
@@ -36,6 +36,15 @@ Interface::Interface() {
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(m_window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
+
+    // const std::string fontFile = "FreeMono.ttf";
+    // const std::string fontFile = "Pixeled.ttf";
+    const std::string fontFile = "PixgamerRegular-OVD6A.ttf";
+    m_fontBody = io.Fonts->AddFontFromFileTTF((ASSETS_RELATIVE_PATH + fontFile).c_str(), FONT_SIZE_BODY);
+    m_fontHeading = io.Fonts->AddFontFromFileTTF((ASSETS_RELATIVE_PATH + fontFile).c_str(), FONT_SIZE_HEADING);
+    IM_ASSERT(m_fontBody != NULL);
+    IM_ASSERT(m_fontHeading != NULL);
+
 }
 
 Interface::~Interface() {
@@ -52,7 +61,7 @@ bool Interface::isAlive() const {
     return !(glfwWindowShouldClose(m_window) || ImGui::IsKeyPressed(ImGuiKey_Q));
 }
 
-void Interface::startFrame() const {
+void Interface::startFrame() {
     glfwPollEvents();
 
     // Start the Dear ImGui frame
@@ -66,8 +75,17 @@ void Interface::startFrame() const {
     //     ImGui::End();
     // }
 
-    // Rendering
-    ImGui::Render();
+
+    // {
+    //     ImGui::SetNextWindowBgAlpha(0.0f);
+    //     ImGui::SetNextWindowPos( ImVec2(0,0) );
+    //     // begin() with NoTitleBar|NoResize|NoMove|NoScrollbar|NoSavedSettings|NoInputs flags. 
+    //     ImGui::Begin("BCKGND", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus );
+    //     // ImGui::Begin("empty");
+    //     ImGui::GetWindowDrawList()->AddText( ImVec2(000,000), ImColor(1.0f,1.0f,1.0f,1.0f), "Text in Background Layer" );
+    //     ImGui::End();
+    // }
+
     int display_w, display_h;
     glfwGetFramebufferSize(m_window, &display_w, &display_h);
     glViewport(0, 0, display_w, display_h);
@@ -76,11 +94,13 @@ void Interface::startFrame() const {
     glClearColor(INTERFACE_CLEAR_COLOR.x(), INTERFACE_CLEAR_COLOR.y(), INTERFACE_CLEAR_COLOR.z(), INTERFACE_CLEAR_COLOR.w());
     glClear(GL_COLOR_BUFFER_BIT);
 
+    updateWindowSize();
     keyboardEvent();
     drawOverlay();
 }
 
 void Interface::renderFrame() const {
+    ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     glfwSwapBuffers(m_window);
 }
@@ -180,4 +200,12 @@ void Interface::drawOverlay() const {
                         m_player->getWidthHeight(), true);
         }
     }
+
+    ImGui::PushFont(m_fontBody);
+    // top left corner of text box (x right, y down)
+    const ImVec2 scorePosXY((int)(.1 * m_windowWidthHeight.x()), (int)(.02 * m_windowWidthHeight.y()));
+    std::string scoreLine = "Score: " + std::to_string(*m_player->getScore());
+    ImGui::GetForegroundDrawList()->AddText(scorePosXY, ImColor(1.0f, 1.0f, 1.0f, 1.0f), scoreLine.c_str());
+    ImGui::PopFont();
+
 }
