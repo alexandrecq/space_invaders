@@ -1,9 +1,8 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
-#include "space_invaders/constants.h"
-#include <string>
 
 #include "space_invaders/interface.h"
+#include <string>
 
 Interface::Interface() {
     glfwSetErrorCallback(glfw_error_callback);
@@ -42,7 +41,6 @@ Interface::Interface() {
     m_fontHeading = io.Fonts->AddFontFromFileTTF((ASSETS_RELATIVE_PATH + fontFile).c_str(), FONT_SIZE_HEADING);
     IM_ASSERT(m_fontBody != NULL);
     IM_ASSERT(m_fontHeading != NULL);
-
 }
 
 Interface::~Interface() {
@@ -73,14 +71,14 @@ void Interface::startFrame() {
     //     ImGui::End();
     // }
 
-
     // {
     //     ImGui::SetNextWindowBgAlpha(0.0f);
-    //     ImGui::SetNextWindowPos( ImVec2(0,0) );
-    //     // begin() with NoTitleBar|NoResize|NoMove|NoScrollbar|NoSavedSettings|NoInputs flags. 
+    //     ImGui::SetNextWindowPos( ImVec2(0, 0) );
+    //     ImGui::SetNextWindowSize( ImVec2(m_windowWidthHeight.x(), m_windowWidthHeight.y()) );
+    //     ImGui::SetNextWindowBgAlpha(.9);
+    //     // ImGui::Begin() with NoTitleBar|NoResize|NoMove|NoScrollbar|NoSavedSettings|NoInputs flags. 
     //     ImGui::Begin("BCKGND", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus );
-    //     // ImGui::Begin("empty");
-    //     ImGui::GetWindowDrawList()->AddText( ImVec2(000,000), ImColor(1.0f,1.0f,1.0f,1.0f), "Text in Background Layer" );
+    //     // ImGui::GetWindowDrawList()->AddText( ImVec2(000,000), ImColor(1.0f,1.0f,1.0f,1.0f), "Text in Background Layer" );
     //     ImGui::End();
     // }
 
@@ -98,22 +96,31 @@ void Interface::startFrame() {
 }
 
 void Interface::renderFrame() const {
+
+    // ImGui::PushFont(m_fontHeading);
+    // drawRectangle({-1, -1}, {2., 2.}, {.1, .1, .1, .5}, true);
+    // const ImVec2 pos(.5 * m_windowWidthHeight.x(), .5 * m_windowWidthHeight.y());
+    // ImGui::GetForegroundDrawList()->AddText(pos, ImColor(1.0f, 1.0f, 1.0f, 1.0f), "GAME OVER!");
+    // ImGui::PopFont();
+
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+
     glfwSwapBuffers(m_window);
 }
 
 void Interface::drawRectangle(
-    Array2f bottomLeft, Array2f widthHeight, Array3f color, bool globalCanvas
+    Array2f bottomLeft, Array2f widthHeight, const Array4f& color, bool globalCanvas
     ) const {
     if (!globalCanvas) m_gameCanvas.mapFromGlobal(widthHeight, bottomLeft);
     glBegin(GL_QUADS);
-    glColor3f(color.x(), color.y(), color.z());
+    glColor4f(color.x(), color.y(), color.z(), color.w());
     glVertex2f(bottomLeft.x(), bottomLeft.y());
     glVertex2f(bottomLeft.x(), bottomLeft.y() + widthHeight.y());
     glVertex2f(bottomLeft.x() + widthHeight.x(), bottomLeft.y() + widthHeight.y());
     glVertex2f(bottomLeft.x() + widthHeight.x(), bottomLeft.y());
-    glColor3f(1, 1, 1);  // reset color
+    glColor4f(1.f, 1.f, 1.f, 1.f);  // reset color
     glEnd();
 }
 
@@ -169,24 +176,31 @@ bool Interface::keyboardEvent() const {
     return false;
 }
 
-void Interface::drawOverlay() const {
-    const float frameThickness = .01;
-    const Array2f frameWidthHeight = m_gameCanvas.m_widthHeight + frameThickness;
-    const Array3f frameColor{1.f, 1.f, 1.f};
-
+void Interface::drawFrame(const Array2f& bottomLeft, const Array2f& widthHeight, float thickness, const Array4f& color) const {
     // Frame shape:
     // |--
     // | |
     // --|
-    drawRectangle(m_gameCanvas.m_bottomLeft - Array2f{frameThickness, 0.f},
-                  {frameThickness, frameWidthHeight.y()}, frameColor, true);
-    drawRectangle(m_gameCanvas.m_bottomLeft + Array2f{m_gameCanvas.m_widthHeight.x(), -frameThickness},
-                  {frameThickness, frameWidthHeight.y()}, frameColor, true);
+    const Array2f frameWidthHeight = widthHeight + thickness;
+    drawRectangle(bottomLeft - Array2f{thickness, 0.f},
+                  {thickness, frameWidthHeight.y()}, color, true);
+    drawRectangle(bottomLeft + Array2f{widthHeight.x(), -thickness},
+                  {thickness, frameWidthHeight.y()}, color, true);
 
-    drawRectangle(m_gameCanvas.m_bottomLeft + Array2f{0.f, m_gameCanvas.m_widthHeight.y()},
-                  {frameWidthHeight.x(), frameThickness}, frameColor, true);
-    drawRectangle(m_gameCanvas.m_bottomLeft - Array2f{frameThickness, frameThickness},
-                  {frameWidthHeight.x(), frameThickness}, frameColor, true);
+    drawRectangle(bottomLeft + Array2f{0.f, widthHeight.y()},
+                  {frameWidthHeight.x(), thickness}, color, true);
+    drawRectangle(bottomLeft - Array2f{thickness, thickness},
+                  {frameWidthHeight.x(), thickness}, color, true);
+}
+
+void Interface::drawOverlay() const {
+    const float frameThickness = .01;
+    const Array4f frameColor{1.f, 1.f, 1.f, 1.f};
+    // draw frame around game canvas
+    drawFrame(m_gameCanvas.m_bottomLeft, m_gameCanvas.m_widthHeight, frameThickness);
+    // draw frame around dashboard
+    drawFrame(m_gameCanvas.m_bottomLeft + Array2f{0.f, m_gameCanvas.m_widthHeight.y() + frameThickness},
+              Array2f{m_gameCanvas.m_widthHeight.x(), 2 - m_gameCanvas.m_widthHeight.y() - 3*frameThickness}, frameThickness);
 
     ImGui::PushFont(m_fontBody);
     const float textLineY = 1.98;

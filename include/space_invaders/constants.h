@@ -1,6 +1,6 @@
 #pragma once
 
-#include "space_invaders/utils.h"
+#include "space_invaders/common.h"
 
 
 //Game
@@ -55,7 +55,7 @@ static const int BARRIER_TOP_RIGHT    = 4;
 static const float INTERFACE_FRAME_THICKNESS = 0.01;
 static const Array2f GAME_CANVAS_BOTTOM_LEFT = {-1, -1};
 static const Array2f GAME_CANVAS_WIDTH_HEIGHT = {2, 1.8};
-static const Eigen::Array4f INTERFACE_CLEAR_COLOR = {0.15f, 0.05f, 0.20f, .90f};
+static const Array4f INTERFACE_CLEAR_COLOR = {0.15f, 0.05f, 0.20f, .90f};
 static const float FONT_SIZE_HEADING = 100;
 static const float FONT_SIZE_BODY = 50;
 

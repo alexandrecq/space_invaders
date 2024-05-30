@@ -37,7 +37,7 @@ protected:
 
 	const Array2f m_widthHeight{.01, .01};
 	Array2f m_position;
-	Array3f m_color{1.f, 1.f, 1.f};
+	Array4f m_color{1.f, 1.f, 1.f, 1.f};
 	entityAnimations m_animations;
 	int m_currentAnimation = ENTITY_DEFAULT_ANIMATION;
 	bool m_active = true;
@@ -64,7 +64,7 @@ public:
 private:
 	float m_vertStepSize;
 	vector<shared_ptr<Entity>> m_targets;
-	long long m_totalHits;
+	long long m_totalHits = 0;
 };
 
 

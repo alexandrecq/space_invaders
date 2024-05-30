@@ -8,7 +8,7 @@
 using std::string;
 using std::vector;
 using Eigen::Array2f;
-using Eigen::Array3f;
+using Eigen::Array4f;
 
 const vector<string> generateTexturePaths(const std::string& baseName, int numTextures);
 
