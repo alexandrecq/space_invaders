@@ -149,31 +149,6 @@ void Game::setAlienTargets() {
     }
 }
 
-void Game::run() {
-    while (m_interface->isAlive()) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(m_tickMS));
-        auto elapsed = std::chrono::steady_clock::now() - m_startTime;
-        auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed);
-        // printf("Elapsed: %.2ld\n", elapsed_ms.count());
-
-        m_interface->startFrame();
-
-        for (auto& entity : m_entities) {
-            if (!entity) continue;
-            if (!m_paused) entity->update(elapsed_ms.count());
-            entity->draw(m_interface.get());
-        }
-
-        if (m_player->getNumLives() <= 0) {
-            m_paused = true;
-            m_interface->displayGameOverScreen();
-        } else if (m_paused) {
-            // m_interface->displayPausedScreen();
-        }
-        m_interface->renderFrame();
-    }
-}
-
 void Game::loadPlayerAnimations(entityAnimations& playerAnimations) {
     playerAnimations[0] = Animation(PLAYER_DEFAULT_TEXTURE_PATHS, 0, true);
     playerAnimations[1] = Animation(PLAYER_DEATH_TEXTURE_PATHS, GAME_DEATH_ANIMATION_TICKS);
@@ -195,3 +170,29 @@ void Game::loadBarrierAnimations(barrierAnimations& barrierAnimations) {
     barrierAnimations[3] = {Animation(BARRIER_D_DEFAULT_TEXTURE_PATHS), Animation()};
     barrierAnimations[4] = {Animation(BARRIER_E_DEFAULT_TEXTURE_PATHS), Animation()};
 }
+
+void Game::run() {
+    while (m_interface->isAlive()) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(m_tickMS));
+        auto elapsed = std::chrono::steady_clock::now() - m_startTime;
+        auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed);
+        // printf("Elapsed: %.2ld\n", elapsed_ms.count());
+
+        m_interface->startFrame();
+
+        for (auto& entity : m_entities) {
+            if (!entity) continue;
+            if (!m_paused) entity->update(elapsed_ms.count());
+            entity->draw(m_interface.get());
+        }
+
+        if (m_player->getNumLives() <= 10) {
+            m_paused = true;
+            m_interface->displayGameOverScreen();
+        } else if (m_paused) {
+            // m_interface->displayPausedScreen();
+        }
+        m_interface->renderFrame();
+    }
+}
+

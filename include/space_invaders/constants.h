@@ -52,13 +52,12 @@ static const int BARRIER_TOP_LEFT     = 3;
 static const int BARRIER_TOP_RIGHT    = 4;
 
 //Interface
-static const float INTERFACE_FRAME_THICKNESS = 0.01;
+static const float INTERFACE_BORDER_THICKNESS = 0.01;
 static const Array2f GAME_CANVAS_BOTTOM_LEFT = {-1, -1};
 static const Array2f GAME_CANVAS_WIDTH_HEIGHT = {2, 1.8};
 static const Array4f INTERFACE_CLEAR_COLOR = {0.15f, 0.05f, 0.20f, .90f};
 static const float FONT_SIZE_HEADING = 150;
 static const float FONT_SIZE_BODY = 50;
-static const float DASHBOARD_TEXT_Y = 1.98;
 
 // Texture paths
 const string ASSETS_RELATIVE_PATH("../assets/");

@@ -15,9 +15,9 @@ void Entity::draw(Interface const *interface) const {
     auto bottomLeft = m_position - m_widthHeight / 2;
 
     if (m_animations[m_currentAnimation].isEmpty()) {
-        interface->drawRectangle(bottomLeft, m_widthHeight, m_color);
+        interface->drawRectangle(bottomLeft, m_widthHeight, m_color, true);
     } else {
-        interface->drawTexture(m_animations[m_currentAnimation].getCurrentTexture(), bottomLeft, m_widthHeight);
+        interface->drawTexture(m_animations[m_currentAnimation].getCurrentTexture(), bottomLeft, m_widthHeight, true);
     }
 }
 

@@ -19,7 +19,7 @@ static void glfw_error_callback(int error, const char* description)
 struct Canvas {
 	Canvas(const Array2f& bottomLeft, const Array2f& widthHeight) :
 		m_bottomLeft(bottomLeft), m_widthHeight(widthHeight) {}
-	void mapFromGlobal(Array2f& widthHeight, Array2f& bottomLeft) const {
+	void mapToGlobal(Array2f& widthHeight, Array2f& bottomLeft) const {
 	    bottomLeft = (bottomLeft + 1) * m_widthHeight / 2  + m_bottomLeft;
 	    widthHeight *= m_widthHeight / 2;
 	}
@@ -35,7 +35,7 @@ public:
 	void renderFrame() const;
 	bool isAlive() const;
 	void drawRectangle(Array2f bottomLeft, Array2f widthHeight,
-		    const Array4f& color = {1.f, 1.f, 1.f, 1.f}, bool globalCanvas = false) const;
+		    const Array4f& color = {1.f, 1.f, 1.f, 1.f}, bool onGameCanvas = false) const;
 	void setGame(Game *game) { m_game = game; }
 	void setPlayer(std::shared_ptr<Player> player) { m_player = player; }
 	void drawTexture(
@@ -45,14 +45,13 @@ public:
 	) const;
 	void drawTexture(
 		const GLuint textureID,
-		Array2f bottomLeft, Array2f widthHeight, bool globalCanvas = false,
-		const Array2f& texBottomLeft = {0.f, 0.f}, const Array2f& texWidthHeight = {1.f, 1.f}
+		Array2f bottomLeft, Array2f widthHeight, bool onGameCanvas = false
 	) const;
 	void displayGameOverScreen();
 private:
 	bool keyboardEvent() const;
 	void drawOverlay() const;
-	void drawFrame(const Array2f& bottomLeft, const Array2f& widthHeight, float thickness,
+	void drawBorder(const Array2f& bottomLeft, const Array2f& widthHeight, float thickness,
 		const Array4f& color = {1.f, 1.f, 1.f, 1.f}
 	) const;
 
@@ -63,8 +62,8 @@ private:
 	ImFont* m_fontBody;
 	ImFont* m_fontHeading;
 	const Canvas m_gameCanvas = Canvas{
-		GAME_CANVAS_BOTTOM_LEFT + INTERFACE_FRAME_THICKNESS,
-		GAME_CANVAS_WIDTH_HEIGHT - 2 * INTERFACE_FRAME_THICKNESS
+		GAME_CANVAS_BOTTOM_LEFT + INTERFACE_BORDER_THICKNESS,
+		GAME_CANVAS_WIDTH_HEIGHT - 2 * INTERFACE_BORDER_THICKNESS
 	};
 
 	inline void updateWindowSize() { glfwGetWindowSize(m_window, &m_windowWidthHeight.x(), &m_windowWidthHeight.y()); }
