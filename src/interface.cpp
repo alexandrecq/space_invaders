@@ -37,9 +37,7 @@ Interface::Interface() {
     ImGui_ImplGlfw_InitForOpenGL(m_window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    // const std::string fontFile = "FreeMono.ttf";
-    // const std::string fontFile = "Pixeled.ttf";
-    const std::string fontFile = "PixgamerRegular-OVD6A.ttf";
+    const std::string fontFile = "Pixeled.ttf";
     m_fontBody = io.Fonts->AddFontFromFileTTF((ASSETS_RELATIVE_PATH + fontFile).c_str(), FONT_SIZE_BODY);
     m_fontHeading = io.Fonts->AddFontFromFileTTF((ASSETS_RELATIVE_PATH + fontFile).c_str(), FONT_SIZE_HEADING);
     IM_ASSERT(m_fontBody != NULL);
@@ -190,6 +188,11 @@ void Interface::drawOverlay() const {
     drawRectangle(m_gameCanvas.m_bottomLeft - Array2f{frameThickness, frameThickness},
                   {frameWidthHeight.x(), frameThickness}, frameColor, true);
 
+    ImGui::PushFont(m_fontBody);
+    const float textLineY = 1.98;
+    const ImVec2 livesPosXY(.5 * m_windowWidthHeight.x(), (2 - textLineY) * m_windowWidthHeight.y());
+    ImGui::GetForegroundDrawList()->AddText(livesPosXY, ImColor(1.0f, 1.0f, 1.0f, 1.0f), "LIVES:\t");
+
     const float dashboardBottomY = GAME_CANVAS_BOTTOM_LEFT.y() + GAME_CANVAS_WIDTH_HEIGHT.y();
     const float dashboardMidY = (dashboardBottomY + 1) / 2;
     const float livesOffsetX = .25;
@@ -201,10 +204,9 @@ void Interface::drawOverlay() const {
         }
     }
 
-    ImGui::PushFont(m_fontBody);
     // top left corner of text box (x right, y down)
-    const ImVec2 scorePosXY((int)(.1 * m_windowWidthHeight.x()), (int)(.02 * m_windowWidthHeight.y()));
-    std::string scoreLine = "Score: " + std::to_string(*m_player->getScore());
+    const ImVec2 scorePosXY(.1 * m_windowWidthHeight.x(), (2 - textLineY) * m_windowWidthHeight.y());
+    std::string scoreLine = "SCORE:\t" + std::to_string(*m_player->getScore());
     ImGui::GetForegroundDrawList()->AddText(scorePosXY, ImColor(1.0f, 1.0f, 1.0f, 1.0f), scoreLine.c_str());
     ImGui::PopFont();
 

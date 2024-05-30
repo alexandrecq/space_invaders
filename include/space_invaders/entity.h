@@ -15,8 +15,8 @@ class Interface;
 
 class Entity {
 public:
-	Entity(Array2f widthHeight, Array2f position, Array3f color);
-	Entity(Array2f widthHeight, Array2f position, Array3f color, entityAnimations animations);
+	Entity(Array2f widthHeight, Array2f position);
+	Entity(Array2f widthHeight, Array2f position, entityAnimations animations);
 	virtual void update(int ticks) = 0;
 	virtual int hit();
 	void draw(Interface const *interface) const;
@@ -33,12 +33,11 @@ public:
 protected:
 	void updateCurrentAnimation(int ticks);
 	virtual void reset();
+	virtual int getHitValue() const { return 0; }
 
 	const Array2f m_widthHeight{.01, .01};
-	// const int m_hitValue = 0;
-	int m_hitValue = 0;
 	Array2f m_position;
-	Array3f m_color;
+	Array3f m_color{1.f, 1.f, 1.f};
 	entityAnimations m_animations;
 	int m_currentAnimation = ENTITY_DEFAULT_ANIMATION;
 	bool m_active = true;
@@ -49,7 +48,7 @@ protected:
 
 class BarrierTile : public Entity {
 public:
-	BarrierTile(Array2f widthHeight, Array2f position, Array3f color, entityAnimations animations);
+	BarrierTile(Array2f widthHeight, Array2f position, entityAnimations animations);
 	void update(int ticks) override;
 protected:
 	int hit() override;
@@ -58,7 +57,7 @@ protected:
 
 class Projectile : public Entity {
 public:
-	Projectile(Array2f widthHeight, Array2f position, Array3f color, float m_vertStepSize);
+	Projectile(Array2f widthHeight, Array2f position, float m_vertStepSize);
 	void update(int ticks) override;
 	void setTargets(vector<shared_ptr<Entity>> targets) { m_targets = targets; }
 	long long const* getTotalHits() const { return &m_totalHits; }
@@ -71,7 +70,7 @@ private:
 
 class EntityThatFires : public Entity {
 public:
-	EntityThatFires(Array2f widthHeight, Array2f position, Array3f color, entityAnimations animations, bool firesUp);
+	EntityThatFires(Array2f widthHeight, Array2f position, entityAnimations animations, bool firesUp);
 	shared_ptr<Projectile> getProjectile() { return m_projectile; }
 	void setProjectileTargets(vector<shared_ptr<Entity>> targets) { m_projectile->setTargets(targets); }
 	void fire();
@@ -83,7 +82,7 @@ protected:
 
 class Player : public EntityThatFires {
 public:
-	Player(Array2f widthHeight, Array2f position, Array3f color, entityAnimations animations);
+	Player(Array2f widthHeight, Array2f position, entityAnimations animations);
 	void update(int ticks) override;
 	void takeStep(bool toTheRight);
 	void reset() override;
@@ -93,18 +92,21 @@ public:
 
 class Alien : public EntityThatFires {
 public:
-	Alien(const Array2f& widthHeight, const Array2f& position, const Array3f& color, entityAnimations animations,
-		const int& numStepsTilReverse,
+	Alien(const Array2f& widthHeight, const Array2f& position, entityAnimations animations,
+		const int& numStepsTilReverse, const int& hitValue,
 		const int& stepEveryTicks = ALIEN_STEP_EVERY_TICKS,
 		const Array2f& stepSize = ALIEN_STEP_SIZE,
 		const float& fireProb = ALIEN_FIRE_PROBABILITY
 	);
 	void update(int ticks) override;
 protected:
+	virtual int getHitValue() const override  { return m_hitValue; }
+
 	const int m_stepEveryTicks;
 	Array2f m_stepSize;
 	int m_lastStepTick = 0;
 private:
+	const int m_hitValue = 0;
 	const int m_numStepsTilReverse;
 	int m_stepsTaken = 0;
 	RandomNumberGenerator m_rng;

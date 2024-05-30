@@ -4,11 +4,11 @@
 
 static const AABB gameAABB({-1, -1}, {1, 1});
 
-Entity::Entity(Array2f widthHeight, Array2f position, Array3f color) :
-    m_position(position), m_widthHeight(widthHeight), m_color(color) {}
+Entity::Entity(Array2f widthHeight, Array2f position) :
+    m_position(position), m_widthHeight(widthHeight) {}
 
-Entity::Entity(Array2f widthHeight, Array2f position, Array3f color, entityAnimations animations) :
-    m_position(position), m_widthHeight(widthHeight), m_color(color), m_animations(animations) {}
+Entity::Entity(Array2f widthHeight, Array2f position, entityAnimations animations) :
+    m_position(position), m_widthHeight(widthHeight), m_animations(animations) {}
 
 void Entity::draw(Interface const *interface) const {
     if (!m_drawMe) return;
@@ -33,7 +33,7 @@ int Entity::hit() {
         m_currentAnimation = ENTITY_DEATH_ANIMATION;
     }
     m_active = false;
-    return m_hitValue;
+    return getHitValue();
 }
 
 void Entity::updateCurrentAnimation(int ticks) {
@@ -48,8 +48,8 @@ void Entity::updateCurrentAnimation(int ticks) {
 void Entity::reset() {}
 
 
-BarrierTile::BarrierTile(Array2f widthHeight, Array2f position, Array3f color, entityAnimations animations) :
-    Entity(widthHeight, position, color, animations) {
+BarrierTile::BarrierTile(Array2f widthHeight, Array2f position, entityAnimations animations) :
+    Entity(widthHeight, position, animations) {
     m_numLives = BARRIER_NUM_LIVES;
 }
 
@@ -63,12 +63,12 @@ int BarrierTile::hit() {
         m_active = false;
         m_drawMe = false;
     }
-    return m_hitValue;
+    return getHitValue();
 }
 
 
-Projectile::Projectile(Array2f widthHeight, Array2f position, Array3f color, float vertStepSize) :
-    Entity(widthHeight, position, color), m_vertStepSize(vertStepSize) {
+Projectile::Projectile(Array2f widthHeight, Array2f position, float vertStepSize) :
+    Entity(widthHeight, position), m_vertStepSize(vertStepSize) {
     m_active = false;
     m_drawMe = false;
 }
@@ -94,14 +94,13 @@ void Projectile::update(int ticks)  {
 }
 
 
-EntityThatFires::EntityThatFires(Array2f widthHeight, Array2f position, Array3f color, entityAnimations animations, bool firesUp) :
-    Entity(widthHeight, position, color, animations), m_firesUp(firesUp) {
+EntityThatFires::EntityThatFires(Array2f widthHeight, Array2f position, entityAnimations animations, bool firesUp) :
+    Entity(widthHeight, position, animations), m_firesUp(firesUp) {
     //set default values for projectile
     const Array2f projectileWidthHeight{.01, .05};
     const Array2f projectilePosition{0, 0};
-    const Array3f projectileColor{1., 1., 1.};
     const float vertStepSize((firesUp ? +1 : -1) * .02);
-    m_projectile = std::make_shared<Projectile>(projectileWidthHeight, projectilePosition, projectileColor, vertStepSize);
+    m_projectile = std::make_shared<Projectile>(projectileWidthHeight, projectilePosition, vertStepSize);
 }
 
 void EntityThatFires::fire() {
@@ -113,8 +112,8 @@ void EntityThatFires::fire() {
 }
 
 
-Player::Player(Array2f widthHeight, Array2f position, Array3f color, entityAnimations animations) :
-    EntityThatFires(widthHeight, position, color, animations, true) {
+Player::Player(Array2f widthHeight, Array2f position, entityAnimations animations) :
+    EntityThatFires(widthHeight, position, animations, true) {
     m_numLives = PLAYER_NUM_LIVES;
 }
 
@@ -137,15 +136,14 @@ void Player::reset() {
 }
 
 
-Alien::Alien(const Array2f& widthHeight, const Array2f& position, const Array3f& color, entityAnimations animations,
-             const int& numStepsTilReverse,
+Alien::Alien(const Array2f& widthHeight, const Array2f& position, entityAnimations animations,
+             const int& numStepsTilReverse, const int& hitValue,
              const int& stepEveryTicks, const Array2f& stepSize, const float& fireProb) :
-    EntityThatFires(widthHeight, position, color, animations, false),
-    m_stepEveryTicks(stepEveryTicks), m_stepSize(stepSize), m_numStepsTilReverse(numStepsTilReverse),
-    m_fireProbability(fireProb)
+    EntityThatFires(widthHeight, position, animations, false),
+    m_numStepsTilReverse(numStepsTilReverse), m_hitValue(hitValue),
+    m_stepEveryTicks(stepEveryTicks), m_stepSize(stepSize), m_fireProbability(fireProb)
 {
     m_stepsTaken = numStepsTilReverse / 2;  //grid starts at center of screen
-    m_hitValue = 100;
 }
 
 void Alien::update(int ticks)  {
@@ -171,8 +169,9 @@ void Alien::update(int ticks)  {
 
 
 Saucer::Saucer(entityAnimations animations) :
-    Alien(SAUCER_WIDTH_HEIGHT, {0, 0}, Array3f{1, 1, 1}, animations,
-          0, SAUCER_STEP_EVERY_TICKS, SAUCER_STEP_SIZE, 0)
+    Alien(SAUCER_WIDTH_HEIGHT, {0, 0}, animations,
+          0, SAUCER_HIT_VALUE,
+          SAUCER_STEP_EVERY_TICKS, SAUCER_STEP_SIZE, 0)
 {
     m_active = false;
     m_drawMe = false;

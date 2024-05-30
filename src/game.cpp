@@ -23,7 +23,7 @@ void Game::initPlayer() {
     entityAnimations playerAnimations;
     loadPlayerAnimations(playerAnimations);
 
-    m_player = std::make_shared<Player>(PLAYER_WIDTH_HEIGHT, PLAYER_START_POSITION, PLAYER_COLOR, playerAnimations);
+    m_player = std::make_shared<Player>(PLAYER_WIDTH_HEIGHT, PLAYER_START_POSITION, playerAnimations);
     m_entities.push_back(m_player);
     m_interface.setPlayer(m_player);
 
@@ -31,8 +31,7 @@ void Game::initPlayer() {
 }
 
 void Game::initAlienGrid(
-    const int numRows, const int numCols,
-    const Array2f alienWidthHeight, const Array3f alienColor
+    const int numRows, const int numCols, const Array2f alienWidthHeight
 ) {
     const Array2f gridIncXY = 1.5 * alienWidthHeight;
     const Array2f stepSize = {alienWidthHeight.x() / 2, -alienWidthHeight.y() / 2};
@@ -47,11 +46,14 @@ void Game::initAlienGrid(
     const Array2f gridBottomLeft{-gridOuterDims.x() / 2, 1 - gridOuterDims.y() - .2};
 
     entityAnimations *rowAnimation = &allAlienAnimations[0];
+    int const *rowHitValue = &ALIEN_A_HIT_VALUE;
     for (int y = 0; y < numRows; y++) {
         if (y > 1 && y < 4) {
             rowAnimation = &allAlienAnimations[1];
+            rowHitValue = &ALIEN_B_HIT_VALUE;
         } else if (y == 4) {
             rowAnimation = &allAlienAnimations[2];
+            rowHitValue = &ALIEN_C_HIT_VALUE;
         }
         for (int x = 0; x < numCols; x++) {
             Array2f alienBottomLeft = gridBottomLeft + Array2f{x * gridIncXY.x(), y * gridIncXY.y()};
@@ -59,9 +61,9 @@ void Game::initAlienGrid(
             auto alien = std::make_shared<Alien>(
                 alienWidthHeight,
                 alienPosition,
-                alienColor,
                 *rowAnimation,
-                numStepsTilReverse
+                numStepsTilReverse,
+                *rowHitValue
             );
             m_entities.push_back(alien);
             m_entities.push_back(alien->getProjectile());
@@ -82,7 +84,7 @@ void Game::initSaucer() {
 
 void Game::initBarrierTiles(
         const Array2f barrierPosition, barrierAnimations& allBarrierAnimations,
-        const int tileRows, const int tileCols, const Array2f tileWidthHeight, const Array3f tileColor
+        const int tileRows, const int tileCols, const Array2f tileWidthHeight
 ) {
     entityAnimations *tileAnimations;
     Array2f barrierBottomLeft = barrierPosition - Array2f{tileCols, tileRows} * tileWidthHeight / 2;
@@ -106,7 +108,7 @@ void Game::initBarrierTiles(
                 tileAnimations = &allBarrierAnimations[BARRIER_FULL_TILE];
             }
 
-            auto barrierTile = std::make_shared<BarrierTile>(tileWidthHeight, tilePosition, tileColor, *tileAnimations);
+            auto barrierTile = std::make_shared<BarrierTile>(tileWidthHeight, tilePosition, *tileAnimations);
             m_entities.push_back(barrierTile);
             m_barriers.push_back(barrierTile);
         }

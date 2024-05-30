@@ -17,29 +17,30 @@ static const int ENTITY_DEATH_ANIMATION = 1;
 // Player
 static const Array2f PLAYER_WIDTH_HEIGHT = {.1, .1};
 static const Array2f PLAYER_START_POSITION = {0, -1 + PLAYER_WIDTH_HEIGHT.y() / 2};
-static const Array3f PLAYER_COLOR = {0., .1, 1.};
 static const float PLAYER_STEP_SIZE = .05;
 static const int PLAYER_NUM_LIVES = 3;
 static const int PLAYER_DEATH_SLEEP_MS = 1000;
 
 // Alien
 static const Array2f ALIEN_WIDTH_HEIGHT = {.1, .1};
-static const Array3f ALIEN_COLOR = {.5, 0, .5};
 static const int ALIEN_STEP_EVERY_TICKS = 500;
 static const Array2f ALIEN_STEP_SIZE = {.05, -.05};
 static const float ALIEN_FIRE_PROBABILITY = .0005f;
+static const int ALIEN_A_HIT_VALUE = 10;
+static const int ALIEN_B_HIT_VALUE = 20;
+static const int ALIEN_C_HIT_VALUE = 40;
 
 // Saucer
 static const Array2f SAUCER_WIDTH_HEIGHT = {.13, .05};
 static const float SAUCER_POS_Y = .85;
 static const int SAUCER_STEP_EVERY_TICKS = 1;
+static const int SAUCER_HIT_VALUE = 200;
 static const Array2f SAUCER_STEP_SIZE = {.005, 0.};
 static const float SAUCER_APPEAR_PROBABILITY = 1.f;
 
 // Barrier
 static const Array2f TILE_WIDTH_HEIGHT = {.08, .08};
 static const float BARRIER_POS_Y = -.75;
-static const Array3f TILE_COLOR = {.5, .4, .1};
 static const int BARRIER_NUM_SHAPES = 5;
 static const int BARRIER_TILE_ROWS = 3;
 static const int BARRIER_TILE_COLS = 4;
