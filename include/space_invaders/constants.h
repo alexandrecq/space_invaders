@@ -8,7 +8,7 @@ static const int GAME_TICK_MS = 1;
 static const int GAME_NUM_ALIEN_ROWS = 5;
 static const int GAME_NUM_ALIEN_COLS = 10;
 static const int GAME_NUM_BARRIERS = 4;
-static const int GAME_DEATH_ANIMATION_TICKS = 50;
+static const int GAME_DEATH_ANIMATION_TICKS = 70;
 
 //Entity
 static const int ENTITY_DEFAULT_ANIMATION = 0;
@@ -19,24 +19,26 @@ static const Array2f PLAYER_WIDTH_HEIGHT = {.1, .1};
 static const Array2f PLAYER_START_POSITION = {0, -1 + PLAYER_WIDTH_HEIGHT.y() / 2};
 static const float PLAYER_STEP_SIZE = .05;
 static const int PLAYER_NUM_LIVES = 3;
-static const int PLAYER_DEATH_SLEEP_MS = 1000;
 
 // Alien
 static const Array2f ALIEN_WIDTH_HEIGHT = {.1, .1};
 static const int ALIEN_STEP_EVERY_TICKS = 500;
 static const Array2f ALIEN_STEP_SIZE = {.05, -.05};
-static const float ALIEN_FIRE_PROBABILITY = .005f;
+static const float ALIEN_FIRE_PROBABILITY = .001f;
 static const int ALIEN_A_HIT_VALUE = 10;
 static const int ALIEN_B_HIT_VALUE = 20;
 static const int ALIEN_C_HIT_VALUE = 40;
 
+//Projectile
+static const float PROJECTILE_VERT_STEP_SIZE = .02f;
+static const Array2f PROJECTILE_WIDTH_HEIGHT{.01f, .05f};
+
 // Saucer
 static const Array2f SAUCER_WIDTH_HEIGHT = {.13, .05};
 static const float SAUCER_POS_Y = .85;
-static const int SAUCER_STEP_EVERY_TICKS = 1;
 static const int SAUCER_HIT_VALUE = 200;
 static const Array2f SAUCER_STEP_SIZE = {.005, 0.};
-static const float SAUCER_APPEAR_PROBABILITY = 1.f;
+static const float SAUCER_APPEAR_PROBABILITY = .001f;
 
 // Barrier
 static const Array2f TILE_WIDTH_HEIGHT = {.08, .08};

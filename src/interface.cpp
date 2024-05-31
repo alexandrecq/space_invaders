@@ -80,10 +80,10 @@ void Interface::startFrame() {
 
     updateWindowSize();
     keyboardEvent();
-    drawOverlay();
 }
 
 void Interface::renderFrame() const {
+    drawOverlay();
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -216,11 +216,24 @@ void Interface::displayPauseScreen() {
     ImVec2 windowWidthHeight = ImGui::GetWindowSize();
 
     ImGui::PushFont(m_fontHeading);
-    string text{"PAUSE"};
-    ImVec2 textSize = ImGui::CalcTextSize(text.c_str());
+    const char* text{"PAUSE"};
+    ImVec2 textSize = ImGui::CalcTextSize(text);
     ImGui::SetCursorPosX((windowWidthHeight.x - textSize.x) * 0.5f);
     ImGui::SetCursorPosY((windowWidthHeight.y - textSize.y) * 0.3f);
-    ImGui::Text("%s", text.c_str());
+    ImGui::Text("%s", text);
+    ImGui::PopFont();
+
+    ImGui::PushFont(m_fontBody);
+    text =
+        "A/D: MOVE LEFT/RIGHT\n"
+        "W: FIRE\n"
+        "[P]AUSE\n"
+        "[R]ESTART\n"
+        "[Q]UIT";
+    textSize = ImGui::CalcTextSize(text);
+    ImGui::SetCursorPosX((windowWidthHeight.x - textSize.x) * 0.5f);
+    ImGui::SetCursorPosY((windowWidthHeight.y - textSize.y) * 0.6f);
+    ImGui::Text("%s", text);
     ImGui::PopFont();
 
     ImGui::End();
@@ -235,19 +248,19 @@ void Interface::displayGameOverScreen() {
     ImVec2 windowWidthHeight = ImGui::GetWindowSize();
 
     ImGui::PushFont(m_fontHeading);
-    string text{"GAME OVER!"};
-    ImVec2 textSize = ImGui::CalcTextSize(text.c_str());
+    const char* text{"GAME OVER!"};
+    ImVec2 textSize = ImGui::CalcTextSize(text);
     ImGui::SetCursorPosX((windowWidthHeight.x - textSize.x) * 0.5f);
     ImGui::SetCursorPosY((windowWidthHeight.y - textSize.y) * 0.25f);
-    ImGui::Text("%s", text.c_str());
+    ImGui::Text("%s", text);
     ImGui::PopFont();
 
     ImGui::PushFont(m_fontBody);
     text = "[R]estart?";
-    textSize = ImGui::CalcTextSize(text.c_str());
+    textSize = ImGui::CalcTextSize(text);
     ImGui::SetCursorPosX((windowWidthHeight.x - textSize.x) * 0.5f);
     ImGui::SetCursorPosY((windowWidthHeight.y - textSize.y) * 0.5f);
-    ImGui::Text("%s", text.c_str());
+    ImGui::Text("%s", text);
     ImGui::PopFont();
 
     ImGui::End();

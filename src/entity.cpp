@@ -96,11 +96,8 @@ void Projectile::update(int ticks)  {
 
 EntityThatFires::EntityThatFires(Array2f widthHeight, Array2f position, entityAnimations animations, bool firesUp) :
     Entity(widthHeight, position, animations), m_firesUp(firesUp) {
-    //set default values for projectile
-    const Array2f projectileWidthHeight{.01, .05};
-    const Array2f projectilePosition{0, 0};
-    const float vertStepSize((firesUp ? +1 : -1) * .02);
-    m_projectile = std::make_shared<Projectile>(projectileWidthHeight, projectilePosition, vertStepSize);
+    const float vertStepSize((firesUp ? +1 : -1) * PROJECTILE_VERT_STEP_SIZE);
+    m_projectile = std::make_shared<Projectile>(PROJECTILE_WIDTH_HEIGHT, Array2f{0.f, 0.f}, vertStepSize);
 }
 
 void EntityThatFires::fire() {
@@ -129,8 +126,6 @@ void Player::takeStep(bool toTheRight) {
 }
 
 void Player::reset() {
-    // std::this_thread::sleep_for(std::chrono::milliseconds(PLAYER_DEATH_SLEEP_MS));
-    // m_currentAnimation = ENTITY_DEFAULT_ANIMATION;
     m_position = PLAYER_START_POSITION;
     m_active = true;
 }
@@ -171,7 +166,7 @@ void Alien::update(int ticks)  {
 Saucer::Saucer(entityAnimations animations) :
     Alien(SAUCER_WIDTH_HEIGHT, {0, 0}, animations,
           0, SAUCER_HIT_VALUE,
-          SAUCER_STEP_EVERY_TICKS, SAUCER_STEP_SIZE, 0)
+          0, SAUCER_STEP_SIZE, 0)
 {
     m_active = false;
     m_drawMe = false;
@@ -180,6 +175,7 @@ Saucer::Saucer(entityAnimations animations) :
 void Saucer::update(int ticks)
 {
     updateCurrentAnimation(ticks);
+    // consider inactive only if mid-animation, otherwise check if we need to make it active again
     if (m_currentAnimation == ENTITY_DEATH_ANIMATION && !m_animations[m_currentAnimation].isDone()) {
         return;
     }
