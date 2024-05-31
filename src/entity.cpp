@@ -154,7 +154,6 @@ void Alien::update(int ticks)  {
     m_rng.generateNumber(&randomNumber);
     if (randomNumber <= m_fireProbability) fire();
 
-    printf("ticks: %d, m_lastStepTick: %d, m_stepEveryTicks: %d\n", ticks, m_lastStepTick, m_stepEveryTicks);
     if (ticks - m_lastStepTick > m_stepEveryTicks) {
         if (m_stepsTaken == m_numStepsTilReverse) {
             m_position.y() += m_stepSize.y();
@@ -203,10 +202,7 @@ void Saucer::update(int ticks)
     }
     if (!m_active) return;
 
-    if (ticks - m_lastStepTick > m_stepEveryTicks) {
-        m_position.x() += m_stepSize.x();
-        m_lastStepTick = ticks;
-    }
+    m_position.x() += m_stepSize.x();
     if (!aabb().intersects(gameAABB)) {
         m_active = false;
         m_drawMe = false;

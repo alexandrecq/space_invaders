@@ -9,13 +9,13 @@
 
 
 Game::Game() {
-    m_startTime = std::chrono::steady_clock::now();
     m_interface = std::make_shared<Interface>();
     m_interface->setGame(this);
     reset();
 }
 
 void Game::reset() {
+    m_startTime = std::chrono::steady_clock::now();
     m_paused = false;
     m_gameOver = false;
 
@@ -155,16 +155,17 @@ void Game::setAlienTargets() {
 
 void Game::run() {
     while (m_interface->isAlive()) {
+        m_interface->startFrame(); // includes keyboard events
+
         std::this_thread::sleep_for(std::chrono::milliseconds(m_tickMS));
         auto elapsed = std::chrono::steady_clock::now() - m_startTime;
         auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed);
-        // printf("Elapsed: %.2ld\n", elapsed_ms.count());
-
-        m_interface->startFrame();
+        int gameTicks = elapsed_ms.count() / m_tickMS;
+        // printf("Elapsed: %.2ld, %d\n", elapsed_ms.count(), gameTicks);
 
         for (auto& entity : m_entities) {
             if (!entity) continue;
-            if (!m_gameOver && !m_paused) entity->update(elapsed_ms.count());
+            if (!m_gameOver && !m_paused) entity->update(gameTicks);
             entity->draw(m_interface.get());
         }
 
@@ -172,7 +173,7 @@ void Game::run() {
             m_gameOver = true;
             m_interface->displayGameOverScreen();
         } else if (m_paused) {
-            // m_interface->displayPausedScreen();
+            m_interface->displayPauseScreen();
         }
         m_interface->renderFrame();
     }

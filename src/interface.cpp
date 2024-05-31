@@ -70,13 +70,6 @@ void Interface::startFrame() {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    // {
-    //     ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-    //     ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-    //     ImGui::End();
-    // }
-
-
     int display_w, display_h;
     glfwGetFramebufferSize(m_window, &display_w, &display_h);
     glViewport(0, 0, display_w, display_h);
@@ -91,10 +84,8 @@ void Interface::startFrame() {
 }
 
 void Interface::renderFrame() const {
-
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
 
     glfwSwapBuffers(m_window);
 }
@@ -216,32 +207,48 @@ void Interface::drawOverlay() const {
     }
 }
 
+void Interface::displayPauseScreen() {
+    ImGui::SetNextWindowBgAlpha(0.9f);
+    ImGui::SetNextWindowPos( ImVec2(0, 0) );
+    ImGui::SetNextWindowSize( ImVec2(m_windowWidthHeight.x(), m_windowWidthHeight.y()) );
+
+    ImGui::Begin("pause", NULL, dummyWindowFlags);
+    ImVec2 windowWidthHeight = ImGui::GetWindowSize();
+
+    ImGui::PushFont(m_fontHeading);
+    string text{"PAUSE"};
+    ImVec2 textSize = ImGui::CalcTextSize(text.c_str());
+    ImGui::SetCursorPosX((windowWidthHeight.x - textSize.x) * 0.5f);
+    ImGui::SetCursorPosY((windowWidthHeight.y - textSize.y) * 0.3f);
+    ImGui::Text("%s", text.c_str());
+    ImGui::PopFont();
+
+    ImGui::End();
+}
+
 void Interface::displayGameOverScreen() {
-    {
-        ImGui::SetNextWindowBgAlpha(0.9f);
-        ImGui::SetNextWindowPos( ImVec2(0, 0) );
-        ImGui::SetNextWindowSize( ImVec2(m_windowWidthHeight.x(), m_windowWidthHeight.y()) );
+    ImGui::SetNextWindowBgAlpha(0.9f);
+    ImGui::SetNextWindowPos( ImVec2(0, 0) );
+    ImGui::SetNextWindowSize( ImVec2(m_windowWidthHeight.x(), m_windowWidthHeight.y()) );
 
-        ImGui::Begin("gameover", NULL, dummyWindowFlags);
-        auto windowWidth = ImGui::GetWindowSize().x;
-        auto windowHeight = ImGui::GetWindowSize().y;
+    ImGui::Begin("gameover", NULL, dummyWindowFlags);
+    ImVec2 windowWidthHeight = ImGui::GetWindowSize();
 
-        ImGui::PushFont(m_fontHeading);
-        string text{"GAME OVER!"};
-        ImVec2 textSize = ImGui::CalcTextSize(text.c_str());
-        ImGui::SetCursorPosX((windowWidth - textSize.x) * 0.5f);
-        ImGui::SetCursorPosY((windowHeight - textSize.y) * 0.25f);
-        ImGui::Text("%s", text.c_str());
-        ImGui::PopFont();
+    ImGui::PushFont(m_fontHeading);
+    string text{"GAME OVER!"};
+    ImVec2 textSize = ImGui::CalcTextSize(text.c_str());
+    ImGui::SetCursorPosX((windowWidthHeight.x - textSize.x) * 0.5f);
+    ImGui::SetCursorPosY((windowWidthHeight.y - textSize.y) * 0.25f);
+    ImGui::Text("%s", text.c_str());
+    ImGui::PopFont();
 
-        ImGui::PushFont(m_fontBody);
-        text = "[R]estart?";
-        textSize = ImGui::CalcTextSize(text.c_str());
-        ImGui::SetCursorPosX((windowWidth - textSize.x) * 0.5f);
-        ImGui::SetCursorPosY((windowHeight - textSize.y) * 0.5f);
-        ImGui::Text("%s", text.c_str());
-        ImGui::PopFont();
+    ImGui::PushFont(m_fontBody);
+    text = "[R]estart?";
+    textSize = ImGui::CalcTextSize(text.c_str());
+    ImGui::SetCursorPosX((windowWidthHeight.x - textSize.x) * 0.5f);
+    ImGui::SetCursorPosY((windowWidthHeight.y - textSize.y) * 0.5f);
+    ImGui::Text("%s", text.c_str());
+    ImGui::PopFont();
 
-        ImGui::End();
-    }
+    ImGui::End();
 }

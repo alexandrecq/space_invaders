@@ -47,6 +47,7 @@ public:
 		const GLuint textureID,
 		Array2f bottomLeft, Array2f widthHeight, bool onGameCanvas = false
 	) const;
+	void displayPauseScreen();
 	void displayGameOverScreen();
 private:
 	bool keyboardEvent() const;
