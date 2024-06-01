@@ -53,7 +53,6 @@ find_package(OpenGL REQUIRED)
 
 # Find all source files in the src directory
 file(GLOB_RECURSE SRC_FILES src/*.cpp)
-# set(SRC_FILES src/main.cpp src/scene.cpp src/common.cpp)
 
 # Add the executable
 add_executable(space_invaders ${SRC_FILES})
