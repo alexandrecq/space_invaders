@@ -197,8 +197,21 @@ void Game::handleKeyboardEvents(keyboardEvents& events) {
 void Game::checkGameOver() {
     if (m_player->getNumLives() <= 0) {
         m_gameOver = true;
+        return;
     }
-    // TODO also check if aliens have reached the bottom
+
+    bool allAliensDead = true;
+    for (auto& alien : m_aliens) {
+        if (alien->hasReachedBottom()) {
+            m_gameOver = true;
+            return;
+        } else if (alien->isActive())
+            allAliensDead = false;
+    }
+    if (allAliensDead) {
+        reset();
+        m_started = false;
+    }
 }
 
 void Game::displayOptionalOverlay() const {

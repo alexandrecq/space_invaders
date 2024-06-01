@@ -98,6 +98,7 @@ public:
 		const float& fireProb = ALIEN_FIRE_PROBABILITY
 	);
 	void update(int ticks) override;
+	bool hasReachedBottom() const;
 protected:
 	virtual int getHitValue() const override  { return m_hitValue; }
 

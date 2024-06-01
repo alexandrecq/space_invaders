@@ -2,7 +2,10 @@
 #include "space_invaders/interface.h"
 
 
+// Game bounds
 static const AABB gameAABB({-1, -1}, {1, 1});
+// Rectangle from bottom to height of player
+static const AABB gameOverAABB({-1, -1}, {1, -1 + PLAYER_WIDTH_HEIGHT.y()});
 
 Entity::Entity(Array2f widthHeight, Array2f position) :
     m_position(position), m_widthHeight(widthHeight) {}
@@ -160,6 +163,10 @@ void Alien::update(int ticks)  {
         }
         m_lastStepTick = ticks;
     }
+}
+
+bool Alien::hasReachedBottom() const {
+    return aabb().intersects(gameOverAABB);
 }
 
 
