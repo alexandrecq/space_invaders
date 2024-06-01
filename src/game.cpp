@@ -9,7 +9,6 @@
 
 
 Game::Game() {
-    m_interface.setGame(this);
     reset();
 }
 
@@ -154,7 +153,10 @@ void Game::setAlienTargets() {
 
 void Game::run() {
     while (m_interface.isAlive()) {
-        m_interface.startFrame(); // includes keyboard events
+        m_interface.startFrame();
+        keyboardEvents events;
+        m_interface.pollKeyboardEvents(events);
+        handleKeyboardEvents(events);
 
         std::this_thread::sleep_for(std::chrono::milliseconds(m_tickMS));
         auto elapsed = std::chrono::steady_clock::now() - m_startTime;
@@ -163,20 +165,46 @@ void Game::run() {
 
         for (auto& entity : m_entities) {
             if (!entity) continue;
-            if (m_started && !m_gameOver && !m_paused) entity->update(gameTicks);
+            if (isRunning()) entity->update(gameTicks);
             entity->draw(&m_interface);
         }
 
+        checkGameOver();
         displayOptionalOverlay();
         m_interface.renderFrame();
     }
 }
 
-void Game::displayOptionalOverlay() {
+void Game::handleKeyboardEvents(keyboardEvents& events) {
+    // game events
+    if (events.gameStart)
+        m_started = true;
+    if (events.gamePause)
+        togglePause();
+    if (events.gameRestart)
+        reset();
+    if (!isRunning()) return;
+
+    // player events
+    if (events.playerStepLeft)
+        m_player->takeStep(false);
+    if (events.playerStepRight)
+        m_player->takeStep(true);
+    if (events.playerFire)
+        m_player->fire();
+}
+
+void Game::checkGameOver() {
+    if (m_player->getNumLives() <= 0) {
+        m_gameOver = true;
+    }
+    // TODO also check if aliens have reached the bottom
+}
+
+void Game::displayOptionalOverlay() const {
     if (!m_started) {
         m_interface.displayStartingOverlay();
-    } else if (m_player->getNumLives() <= 0) {
-        m_gameOver = true;
+    } else if (m_gameOver) {
         m_interface.displayGameOverOverlay();
     } else if (m_paused) {
         m_interface.displayPauseOverlay();

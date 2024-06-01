@@ -10,10 +10,8 @@ class Game {
 public:
 	Game();
 	void run();
-	void togglePause() { m_paused = !m_paused; }
-	void start() { m_started = true; }
-	void reset();
 private:
+	void reset();
 	void initPlayer();
 	void initAlienGrid(
 		const int numRows = GAME_NUM_ALIEN_ROWS, const int numCols = GAME_NUM_ALIEN_COLS,
@@ -28,7 +26,11 @@ private:
 	void initBarriers(const int numBarriers = GAME_NUM_BARRIERS);
 	void setPlayerTargets();
 	void setAlienTargets();
-	void displayOptionalOverlay();
+	void handleKeyboardEvents(keyboardEvents& events);
+	void checkGameOver();
+	bool isRunning () const { return (m_started && !m_gameOver && !m_paused); }
+	void togglePause() { m_paused = !m_paused; }
+	void displayOptionalOverlay() const;
 
 	Interface m_interface;
 	shared_ptr<Player> m_player;

@@ -8,13 +8,16 @@
 #include "space_invaders/common.h"
 #include "space_invaders/constants.h"
 
-class Game;
 class Player;
 
-static void glfw_error_callback(int error, const char* description)
-{
-    fprintf(stderr, "GLFW Error %d: %s\n", error, description);
-}
+struct keyboardEvents {
+	bool playerStepLeft = false;
+	bool playerStepRight = false;
+	bool playerFire = false;
+	bool gameStart = false;
+	bool gamePause = false;
+	bool gameRestart = false;
+};
 
 struct Canvas {
 	Canvas(const Array2f& bottomLeft, const Array2f& widthHeight) :
@@ -31,12 +34,12 @@ class Interface {
 public:
 	Interface();
 	~Interface();
+	void pollKeyboardEvents(keyboardEvents& events) const;
 	void startFrame();
 	void renderFrame() const;
 	bool isAlive() const;
 	void drawRectangle(Array2f bottomLeft, Array2f widthHeight,
 		    const Array4f& color = {1.f, 1.f, 1.f, 1.f}, bool onGameCanvas = false) const;
-	void setGame(Game *game) { m_game = game; }
 	void setPlayer(std::shared_ptr<Player> player) { m_player = player; }
 	void drawTexture(
 		const GLuint textureID,
@@ -47,18 +50,17 @@ public:
 		const GLuint textureID,
 		Array2f bottomLeft, Array2f widthHeight, bool onGameCanvas = false
 	) const;
-	void displayStartingOverlay();
-	void displayPauseOverlay();
-	void displayGameOverOverlay();
+	void displayStartingOverlay() const;
+	void displayPauseOverlay() const;
+	void displayGameOverOverlay() const;
 private:
-	bool keyboardEvent() const;
+	// bool keyboardEvent() const;
 	void drawDashboard() const;
 	void drawBorder(const Array2f& bottomLeft, const Array2f& widthHeight, float thickness,
 		const Array4f& color = {1.f, 1.f, 1.f, 1.f}
 	) const;
 	inline void updateWindowSize() { glfwGetWindowSize(m_window, &m_windowWidthHeight.x(), &m_windowWidthHeight.y()); }
 
-	Game *m_game;
 	std::shared_ptr<Player> m_player;
 	GLFWwindow* m_window = nullptr;
 	Eigen::Array2i m_windowWidthHeight;

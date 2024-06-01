@@ -9,8 +9,12 @@
 static const ImGuiWindowFlags dummyWindowFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus;
 
 
-Interface::Interface() {
+static void glfw_error_callback(int error, const char* description)
+{
+    fprintf(stderr, "GLFW Error %d: %s\n", error, description);
+}
 
+Interface::Interface() {
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
         return;
@@ -79,7 +83,6 @@ void Interface::startFrame() {
     glClear(GL_COLOR_BUFFER_BIT);
 
     updateWindowSize();
-    keyboardEvent();
 }
 
 void Interface::renderFrame() const {
@@ -135,22 +138,21 @@ void Interface::drawTexture(
     drawTexture(textureID, bottomLeft.x(), bottomLeft.y(), widthHeight.x(), widthHeight.y());
 }
 
-bool Interface::keyboardEvent() const {
+void Interface::pollKeyboardEvents(keyboardEvents& events) const {
     if (ImGui::GetIO().WantCaptureKeyboard)
-        return false;
+        return;
     if (ImGui::IsKeyPressed(ImGuiKey_A))
-        m_player->takeStep(false);
+        events.playerStepLeft = true;
     if (ImGui::IsKeyPressed(ImGuiKey_D))
-        m_player->takeStep(true);
+        events.playerStepRight = true;
     if (ImGui::IsKeyPressed(ImGuiKey_W))
-        m_player->fire();
-    if (ImGui::IsKeyPressed(ImGuiKey_P))
-        m_game->togglePause();
-    if (ImGui::IsKeyPressed(ImGuiKey_R))
-        m_game->reset();
+        events.playerFire = true;
     if (ImGui::IsKeyPressed(ImGuiKey_S))
-        m_game->start();
-    return false;
+        events.gameStart = true;
+    if (ImGui::IsKeyPressed(ImGuiKey_P))
+        events.gamePause = true;
+    if (ImGui::IsKeyPressed(ImGuiKey_R))
+        events.gameRestart = true;
 }
 
 void Interface::drawBorder(const Array2f& bottomLeft, const Array2f& widthHeight, float thickness, const Array4f& color) const {
@@ -209,7 +211,7 @@ void Interface::drawDashboard() const {
     }
 }
 
-void Interface::displayStartingOverlay() {
+void Interface::displayStartingOverlay() const {
     ImGui::SetNextWindowBgAlpha(INTERFACE_OVERLAY_ALPHA);
     ImGui::SetNextWindowPos( ImVec2(0, 0) );
     ImGui::SetNextWindowSize( ImVec2(m_windowWidthHeight.x(), m_windowWidthHeight.y()) );
@@ -242,7 +244,7 @@ void Interface::displayStartingOverlay() {
     ImGui::End();
 }
 
-void Interface::displayPauseOverlay() {
+void Interface::displayPauseOverlay() const {
     ImGui::SetNextWindowBgAlpha(INTERFACE_OVERLAY_ALPHA);
     ImGui::SetNextWindowPos( ImVec2(0, 0) );
     ImGui::SetNextWindowSize( ImVec2(m_windowWidthHeight.x(), m_windowWidthHeight.y()) );
@@ -261,7 +263,7 @@ void Interface::displayPauseOverlay() {
     ImGui::End();
 }
 
-void Interface::displayGameOverOverlay() {
+void Interface::displayGameOverOverlay() const {
     ImGui::SetNextWindowBgAlpha(INTERFACE_OVERLAY_ALPHA);
     ImGui::SetNextWindowPos( ImVec2(0, 0) );
     ImGui::SetNextWindowSize( ImVec2(m_windowWidthHeight.x(), m_windowWidthHeight.y()) );

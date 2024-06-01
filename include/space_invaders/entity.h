@@ -28,7 +28,7 @@ public:
 	bool isActive() const { return m_active; }
 	void setDrawMe(bool drawMe) { m_drawMe = drawMe; }
 	int getNumLives() { return m_numLives; }
-	Animation getDefaultAnimation() { return m_animations[0]; }
+	Animation getDefaultAnimation() { return m_animations[ENTITY_DEFAULT_ANIMATION]; }
 protected:
 	void updateCurrentAnimation(int ticks);
 	virtual void reset();
