@@ -1,7 +1,7 @@
 #include "space_invaders/common.h"
 
 const vector<string> generateTexturePaths(const std::string& baseName, int numTextures) {
-    std::vector<std::string> texturePaths;
+    vector<string> texturePaths;
     texturePaths.reserve(numTextures);
     for (int i = 0; i < numTextures; ++i) {
         texturePaths.push_back(baseName + std::to_string(i) + ".png");
@@ -18,6 +18,6 @@ RandomNumberGenerator::RandomNumberGenerator() {
     m_distribution = dist;
 }
 
-void RandomNumberGenerator::generateNumber(float* numberOut) {
-    *numberOut = m_distribution(m_gen);
+void RandomNumberGenerator::generateNumber(float& numberOut) {
+    numberOut = m_distribution(m_gen);
 }

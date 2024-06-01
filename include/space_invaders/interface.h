@@ -34,7 +34,7 @@ class Interface {
 public:
 	Interface();
 	~Interface();
-	void pollKeyboardEvents(keyboardEvents& events) const;
+	void pollKeyboardEvents(keyboardEvents& eventsOut) const;
 	void startFrame();
 	void renderFrame() const;
 	bool isAlive() const;

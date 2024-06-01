@@ -19,7 +19,7 @@ const vector<string> generateTexturePaths(const std::string& baseName, int numTe
 class RandomNumberGenerator{
 public:
 	RandomNumberGenerator();
-	void generateNumber(float* numberOut);
+	void generateNumber(float& numberOut);
 private:
 	std::mt19937 m_gen;
 	std::uniform_real_distribution<> m_distribution;

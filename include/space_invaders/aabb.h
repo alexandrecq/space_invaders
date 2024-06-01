@@ -7,7 +7,7 @@ using Eigen::Array2f;
 class AABB {
 public:
 	AABB(Array2f min, Array2f max) : m_min(min), m_max(max) {};
-	bool intersects(AABB other);
+	bool intersects(AABB other) const;
 	void print();
 private:
 	Array2f m_min;

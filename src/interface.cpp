@@ -138,21 +138,21 @@ void Interface::drawTexture(
     drawTexture(textureID, bottomLeft.x(), bottomLeft.y(), widthHeight.x(), widthHeight.y());
 }
 
-void Interface::pollKeyboardEvents(keyboardEvents& events) const {
+void Interface::pollKeyboardEvents(keyboardEvents& eventsOut) const {
     if (ImGui::GetIO().WantCaptureKeyboard)
         return;
     if (ImGui::IsKeyPressed(ImGuiKey_A))
-        events.playerStepLeft = true;
+        eventsOut.playerStepLeft = true;
     if (ImGui::IsKeyPressed(ImGuiKey_D))
-        events.playerStepRight = true;
+        eventsOut.playerStepRight = true;
     if (ImGui::IsKeyPressed(ImGuiKey_W))
-        events.playerFire = true;
+        eventsOut.playerFire = true;
     if (ImGui::IsKeyPressed(ImGuiKey_S))
-        events.gameStart = true;
+        eventsOut.gameStart = true;
     if (ImGui::IsKeyPressed(ImGuiKey_P))
-        events.gamePause = true;
+        eventsOut.gamePause = true;
     if (ImGui::IsKeyPressed(ImGuiKey_R))
-        events.gameRestart = true;
+        eventsOut.gameRestart = true;
 }
 
 void Interface::drawBorder(const Array2f& bottomLeft, const Array2f& widthHeight, float thickness, const Array4f& color) const {

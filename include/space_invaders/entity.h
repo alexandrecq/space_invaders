@@ -104,11 +104,11 @@ protected:
 	const int m_stepEveryTicks;
 	Array2f m_stepSize;
 	int m_lastStepTick = 0;
+	RandomNumberGenerator m_rng;
 private:
 	const int m_hitValue = 0;
 	const int m_numStepsTilReverse;
 	int m_stepsTaken = 0;
-	RandomNumberGenerator m_rng;
 	const float m_fireProbability;
 };
 
@@ -119,5 +119,4 @@ public:
 	void update(int ticks) override;
 private:
 	const float m_appearProbability = SAUCER_APPEAR_PROBABILITY;
-	RandomNumberGenerator m_rng;
 };

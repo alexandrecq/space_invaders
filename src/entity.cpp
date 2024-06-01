@@ -146,7 +146,7 @@ void Alien::update(int ticks)  {
     if (!m_active) return;
 
     float randomNumber;
-    m_rng.generateNumber(&randomNumber);
+    m_rng.generateNumber(randomNumber);
     if (randomNumber <= m_fireProbability) fire();
 
     if (ticks - m_lastStepTick > m_stepEveryTicks) {
@@ -180,7 +180,7 @@ void Saucer::update(int ticks)
         return;
     }
     float randomNumber;
-    m_rng.generateNumber(&randomNumber);
+    m_rng.generateNumber(randomNumber);
     if (!m_active && randomNumber <= m_appearProbability) {
         m_active = true;
         m_drawMe = true;
