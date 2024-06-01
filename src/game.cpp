@@ -203,11 +203,11 @@ void Game::checkGameOver() {
 
 void Game::displayOptionalOverlay() const {
     if (!m_started) {
-        m_interface.displayStartingOverlay();
-    } else if (m_gameOver) {
-        m_interface.displayGameOverOverlay();
+        m_interface.displayOverlay(OverlayType::Starting);
     } else if (m_paused) {
-        m_interface.displayPauseOverlay();
+        m_interface.displayOverlay(OverlayType::Pause);
+    } else if (m_gameOver) {
+        m_interface.displayOverlay(OverlayType::GameOver);
     }
 }
 

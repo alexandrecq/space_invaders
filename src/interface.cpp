@@ -4,14 +4,37 @@
 
 #include "space_invaders/interface.h"
 #include "space_invaders/entity.h"
-#include "space_invaders/game.h"
+
 
 static const ImGuiWindowFlags dummyWindowFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus;
-
 
 static void glfw_error_callback(int error, const char* description)
 {
     fprintf(stderr, "GLFW Error %d: %s\n", error, description);
+}
+
+OverlayConfig getOverlayConfig(OverlayType type) {
+    switch (type) {
+        case OverlayType::Starting:
+            return {"starting", "SPACE INVADERS",
+                    "A/D: MOVE LEFT/RIGHT\nW: FIRE\n[S]TART\n[P]AUSE\n[R]ESTART\n[Q]UIT"};
+        case OverlayType::Pause:
+            return {"pause", "PAUSE", nullptr};
+        case OverlayType::GameOver:
+            return {"gameover", "GAME OVER!", "[R]ESTART?"};
+        default:
+            return {"", "", nullptr};
+    }
+}
+
+// Helper function to render horizontally centered text at specified vertical position
+void renderText(const char* text, float posY, ImVec2 windowWidthHeight, ImFont* font = nullptr) {
+    if (font) ImGui::PushFont(font);
+    ImVec2 textSize = ImGui::CalcTextSize(text);
+    ImGui::SetCursorPosX((windowWidthHeight.x - textSize.x) * 0.5f);
+    ImGui::SetCursorPosY((windowWidthHeight.y - textSize.y) * posY);
+    ImGui::Text("%s", text);
+    ImGui::PopFont();
 }
 
 Interface::Interface() {
@@ -211,81 +234,20 @@ void Interface::drawDashboard() const {
     }
 }
 
-void Interface::displayStartingOverlay() const {
+void Interface::displayOverlay(OverlayType type) const {
     ImGui::SetNextWindowBgAlpha(INTERFACE_OVERLAY_ALPHA);
-    ImGui::SetNextWindowPos( ImVec2(0, 0) );
-    ImGui::SetNextWindowSize( ImVec2(m_windowWidthHeight.x(), m_windowWidthHeight.y()) );
+    ImGui::SetNextWindowPos(ImVec2(0, 0));
+    ImGui::SetNextWindowSize(ImVec2(m_windowWidthHeight.x(), m_windowWidthHeight.y()));
 
-    ImGui::Begin("starting", NULL, dummyWindowFlags);
+    OverlayConfig config = getOverlayConfig(type);
+    ImGui::Begin(config.windowTitle, NULL, dummyWindowFlags);
     ImVec2 windowWidthHeight = ImGui::GetWindowSize();
 
-    ImGui::PushFont(m_fontHeading);
-    const char* text{"SPACE INVADERS"};
-    ImVec2 textSize = ImGui::CalcTextSize(text);
-    ImGui::SetCursorPosX((windowWidthHeight.x - textSize.x) * 0.5f);
-    ImGui::SetCursorPosY((windowWidthHeight.y - textSize.y) * 0.25f);
-    ImGui::Text("%s", text);
-    ImGui::PopFont();
-
-    ImGui::PushFont(m_fontBody);
-    text =
-        "A/D: MOVE LEFT/RIGHT\n"
-        "W: FIRE\n"
-        "[S]TART\n"
-        "[P]AUSE\n"
-        "[R]ESTART\n"
-        "[Q]UIT";
-    textSize = ImGui::CalcTextSize(text);
-    ImGui::SetCursorPosX((windowWidthHeight.x - textSize.x) * 0.5f);
-    ImGui::SetCursorPosY((windowWidthHeight.y - textSize.y) * 0.6f);
-    ImGui::Text("%s", text);
-    ImGui::PopFont();
+    // Display the heading text
+    renderText(config.headingText, 0.3, windowWidthHeight, m_fontHeading);
+    // Display the body text if available
+    if (config.bodyText) renderText(config.bodyText, 0.6, windowWidthHeight, m_fontBody);
 
     ImGui::End();
 }
 
-void Interface::displayPauseOverlay() const {
-    ImGui::SetNextWindowBgAlpha(INTERFACE_OVERLAY_ALPHA);
-    ImGui::SetNextWindowPos( ImVec2(0, 0) );
-    ImGui::SetNextWindowSize( ImVec2(m_windowWidthHeight.x(), m_windowWidthHeight.y()) );
-
-    ImGui::Begin("pause", NULL, dummyWindowFlags);
-    ImVec2 windowWidthHeight = ImGui::GetWindowSize();
-
-    ImGui::PushFont(m_fontHeading);
-    const char* text{"PAUSE"};
-    ImVec2 textSize = ImGui::CalcTextSize(text);
-    ImGui::SetCursorPosX((windowWidthHeight.x - textSize.x) * 0.5f);
-    ImGui::SetCursorPosY((windowWidthHeight.y - textSize.y) * 0.3f);
-    ImGui::Text("%s", text);
-    ImGui::PopFont();
-
-    ImGui::End();
-}
-
-void Interface::displayGameOverOverlay() const {
-    ImGui::SetNextWindowBgAlpha(INTERFACE_OVERLAY_ALPHA);
-    ImGui::SetNextWindowPos( ImVec2(0, 0) );
-    ImGui::SetNextWindowSize( ImVec2(m_windowWidthHeight.x(), m_windowWidthHeight.y()) );
-
-    ImGui::Begin("gameover", NULL, dummyWindowFlags);
-    ImVec2 windowWidthHeight = ImGui::GetWindowSize();
-
-    ImGui::PushFont(m_fontHeading);
-    const char* text{"GAME OVER!"};
-    ImVec2 textSize = ImGui::CalcTextSize(text);
-    ImGui::SetCursorPosX((windowWidthHeight.x - textSize.x) * 0.5f);
-    ImGui::SetCursorPosY((windowWidthHeight.y - textSize.y) * 0.3f);
-    ImGui::Text("%s", text);
-    ImGui::PopFont();
-
-    ImGui::PushFont(m_fontBody);
-    text = "[R]ESTART?";
-    textSize = ImGui::CalcTextSize(text);
-    ImGui::SetCursorPosX((windowWidthHeight.x - textSize.x) * 0.5f);
-    ImGui::SetCursorPosY((windowWidthHeight.y - textSize.y) * 0.6f);
-    ImGui::Text("%s", text);
-    ImGui::PopFont();
-
-    ImGui::End();
-}
