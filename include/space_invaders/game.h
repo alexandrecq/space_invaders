@@ -2,10 +2,9 @@
 
 #include <chrono>
 
-#include "space_invaders/constants.h"
+#include "space_invaders/interface.h"
 #include "space_invaders/entity.h"
 
-class Interface;
 
 class Game {
 public:
@@ -31,7 +30,7 @@ private:
 	void setAlienTargets();
 	void displayOptionalOverlay();
 
-	shared_ptr<Interface> m_interface;
+	Interface m_interface;
 	shared_ptr<Player> m_player;
 	vector<shared_ptr<Entity>> m_entities;
 	vector<shared_ptr<Alien>> m_aliens;

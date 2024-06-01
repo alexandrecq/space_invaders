@@ -7,7 +7,7 @@ Requires OpenGL 3 and GLFW libraries to be installed. DearImGui and stb_image ar
 Make sure to include submodules when cloning, then use cmake to build:
 
 ```sh
-git submodule update --init --recursive
+git clone --recursive https://github.com/alexandrecq/space_invaders.git
 mkdir build && cd build
 cmake ..
 make

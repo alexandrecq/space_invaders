@@ -56,6 +56,7 @@ private:
 	void drawBorder(const Array2f& bottomLeft, const Array2f& widthHeight, float thickness,
 		const Array4f& color = {1.f, 1.f, 1.f, 1.f}
 	) const;
+	inline void updateWindowSize() { glfwGetWindowSize(m_window, &m_windowWidthHeight.x(), &m_windowWidthHeight.y()); }
 
 	Game *m_game;
 	std::shared_ptr<Player> m_player;
@@ -67,6 +68,4 @@ private:
 		GAME_CANVAS_BOTTOM_LEFT + INTERFACE_BORDER_THICKNESS,
 		GAME_CANVAS_WIDTH_HEIGHT - 2 * INTERFACE_BORDER_THICKNESS
 	};
-
-	inline void updateWindowSize() { glfwGetWindowSize(m_window, &m_windowWidthHeight.x(), &m_windowWidthHeight.y()); }
 };

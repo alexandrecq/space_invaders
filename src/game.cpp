@@ -9,8 +9,7 @@
 
 
 Game::Game() {
-    m_interface = std::make_shared<Interface>();
-    m_interface->setGame(this);
+    m_interface.setGame(this);
     reset();
 }
 
@@ -38,7 +37,7 @@ void Game::initPlayer() {
 
     m_player = std::make_shared<Player>(PLAYER_WIDTH_HEIGHT, PLAYER_START_POSITION, playerAnimations);
     m_entities.push_back(m_player);
-    m_interface->setPlayer(m_player);
+    m_interface.setPlayer(m_player);
 
     m_entities.push_back(m_player->getProjectile());
 }
@@ -154,8 +153,8 @@ void Game::setAlienTargets() {
 }
 
 void Game::run() {
-    while (m_interface->isAlive()) {
-        m_interface->startFrame(); // includes keyboard events
+    while (m_interface.isAlive()) {
+        m_interface.startFrame(); // includes keyboard events
 
         std::this_thread::sleep_for(std::chrono::milliseconds(m_tickMS));
         auto elapsed = std::chrono::steady_clock::now() - m_startTime;
@@ -165,22 +164,22 @@ void Game::run() {
         for (auto& entity : m_entities) {
             if (!entity) continue;
             if (m_started && !m_gameOver && !m_paused) entity->update(gameTicks);
-            entity->draw(m_interface.get());
+            entity->draw(&m_interface);
         }
 
         displayOptionalOverlay();
-        m_interface->renderFrame();
+        m_interface.renderFrame();
     }
 }
 
 void Game::displayOptionalOverlay() {
     if (!m_started) {
-        m_interface->displayStartingOverlay();
+        m_interface.displayStartingOverlay();
     } else if (m_player->getNumLives() <= 0) {
         m_gameOver = true;
-        m_interface->displayGameOverOverlay();
+        m_interface.displayGameOverOverlay();
     } else if (m_paused) {
-        m_interface->displayPauseOverlay();
+        m_interface.displayPauseOverlay();
     }
 }
 
