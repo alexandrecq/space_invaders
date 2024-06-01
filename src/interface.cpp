@@ -83,7 +83,7 @@ void Interface::startFrame() {
 }
 
 void Interface::renderFrame() const {
-    drawOverlay();
+    drawDashboard();
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -148,6 +148,8 @@ bool Interface::keyboardEvent() const {
         m_game->togglePause();
     if (ImGui::IsKeyPressed(ImGuiKey_R))
         m_game->reset();
+    if (ImGui::IsKeyPressed(ImGuiKey_S))
+        m_game->start();
     return false;
 }
 
@@ -168,7 +170,7 @@ void Interface::drawBorder(const Array2f& bottomLeft, const Array2f& widthHeight
                   {borderWidthHeight.x(), thickness}, color);
 }
 
-void Interface::drawOverlay() const {
+void Interface::drawDashboard() const {
     // draw border around game canvas and dashboard
     const float borderThickness = INTERFACE_BORDER_THICKNESS;
     const Array4f borderColor{1.f, 1.f, 1.f, 1.f};
@@ -207,8 +209,41 @@ void Interface::drawOverlay() const {
     }
 }
 
-void Interface::displayPauseScreen() {
-    ImGui::SetNextWindowBgAlpha(0.9f);
+void Interface::displayStartingOverlay() {
+    ImGui::SetNextWindowBgAlpha(INTERFACE_OVERLAY_ALPHA);
+    ImGui::SetNextWindowPos( ImVec2(0, 0) );
+    ImGui::SetNextWindowSize( ImVec2(m_windowWidthHeight.x(), m_windowWidthHeight.y()) );
+
+    ImGui::Begin("starting", NULL, dummyWindowFlags);
+    ImVec2 windowWidthHeight = ImGui::GetWindowSize();
+
+    ImGui::PushFont(m_fontHeading);
+    const char* text{"SPACE INVADERS"};
+    ImVec2 textSize = ImGui::CalcTextSize(text);
+    ImGui::SetCursorPosX((windowWidthHeight.x - textSize.x) * 0.5f);
+    ImGui::SetCursorPosY((windowWidthHeight.y - textSize.y) * 0.25f);
+    ImGui::Text("%s", text);
+    ImGui::PopFont();
+
+    ImGui::PushFont(m_fontBody);
+    text =
+        "A/D: MOVE LEFT/RIGHT\n"
+        "W: FIRE\n"
+        "[S]TART\n"
+        "[P]AUSE\n"
+        "[R]ESTART\n"
+        "[Q]UIT";
+    textSize = ImGui::CalcTextSize(text);
+    ImGui::SetCursorPosX((windowWidthHeight.x - textSize.x) * 0.5f);
+    ImGui::SetCursorPosY((windowWidthHeight.y - textSize.y) * 0.6f);
+    ImGui::Text("%s", text);
+    ImGui::PopFont();
+
+    ImGui::End();
+}
+
+void Interface::displayPauseOverlay() {
+    ImGui::SetNextWindowBgAlpha(INTERFACE_OVERLAY_ALPHA);
     ImGui::SetNextWindowPos( ImVec2(0, 0) );
     ImGui::SetNextWindowSize( ImVec2(m_windowWidthHeight.x(), m_windowWidthHeight.y()) );
 
@@ -223,24 +258,11 @@ void Interface::displayPauseScreen() {
     ImGui::Text("%s", text);
     ImGui::PopFont();
 
-    ImGui::PushFont(m_fontBody);
-    text =
-        "A/D: MOVE LEFT/RIGHT\n"
-        "W: FIRE\n"
-        "[P]AUSE\n"
-        "[R]ESTART\n"
-        "[Q]UIT";
-    textSize = ImGui::CalcTextSize(text);
-    ImGui::SetCursorPosX((windowWidthHeight.x - textSize.x) * 0.5f);
-    ImGui::SetCursorPosY((windowWidthHeight.y - textSize.y) * 0.6f);
-    ImGui::Text("%s", text);
-    ImGui::PopFont();
-
     ImGui::End();
 }
 
-void Interface::displayGameOverScreen() {
-    ImGui::SetNextWindowBgAlpha(0.9f);
+void Interface::displayGameOverOverlay() {
+    ImGui::SetNextWindowBgAlpha(INTERFACE_OVERLAY_ALPHA);
     ImGui::SetNextWindowPos( ImVec2(0, 0) );
     ImGui::SetNextWindowSize( ImVec2(m_windowWidthHeight.x(), m_windowWidthHeight.y()) );
 
@@ -251,15 +273,15 @@ void Interface::displayGameOverScreen() {
     const char* text{"GAME OVER!"};
     ImVec2 textSize = ImGui::CalcTextSize(text);
     ImGui::SetCursorPosX((windowWidthHeight.x - textSize.x) * 0.5f);
-    ImGui::SetCursorPosY((windowWidthHeight.y - textSize.y) * 0.25f);
+    ImGui::SetCursorPosY((windowWidthHeight.y - textSize.y) * 0.3f);
     ImGui::Text("%s", text);
     ImGui::PopFont();
 
     ImGui::PushFont(m_fontBody);
-    text = "[R]estart?";
+    text = "[R]ESTART?";
     textSize = ImGui::CalcTextSize(text);
     ImGui::SetCursorPosX((windowWidthHeight.x - textSize.x) * 0.5f);
-    ImGui::SetCursorPosY((windowWidthHeight.y - textSize.y) * 0.5f);
+    ImGui::SetCursorPosY((windowWidthHeight.y - textSize.y) * 0.6f);
     ImGui::Text("%s", text);
     ImGui::PopFont();
 

@@ -47,11 +47,12 @@ public:
 		const GLuint textureID,
 		Array2f bottomLeft, Array2f widthHeight, bool onGameCanvas = false
 	) const;
-	void displayPauseScreen();
-	void displayGameOverScreen();
+	void displayStartingOverlay();
+	void displayPauseOverlay();
+	void displayGameOverOverlay();
 private:
 	bool keyboardEvent() const;
-	void drawOverlay() const;
+	void drawDashboard() const;
 	void drawBorder(const Array2f& bottomLeft, const Array2f& widthHeight, float thickness,
 		const Array4f& color = {1.f, 1.f, 1.f, 1.f}
 	) const;

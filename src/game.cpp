@@ -161,21 +161,26 @@ void Game::run() {
         auto elapsed = std::chrono::steady_clock::now() - m_startTime;
         auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed);
         int gameTicks = elapsed_ms.count() / m_tickMS;
-        // printf("Elapsed: %.2ld, %d\n", elapsed_ms.count(), gameTicks);
 
         for (auto& entity : m_entities) {
             if (!entity) continue;
-            if (!m_gameOver && !m_paused) entity->update(gameTicks);
+            if (m_started && !m_gameOver && !m_paused) entity->update(gameTicks);
             entity->draw(m_interface.get());
         }
 
-        if (m_player->getNumLives() <= 0) {
-            m_gameOver = true;
-            m_interface->displayGameOverScreen();
-        } else if (m_paused) {
-            m_interface->displayPauseScreen();
-        }
+        displayOptionalOverlay();
         m_interface->renderFrame();
+    }
+}
+
+void Game::displayOptionalOverlay() {
+    if (!m_started) {
+        m_interface->displayStartingOverlay();
+    } else if (m_player->getNumLives() <= 0) {
+        m_gameOver = true;
+        m_interface->displayGameOverOverlay();
+    } else if (m_paused) {
+        m_interface->displayPauseOverlay();
     }
 }
 

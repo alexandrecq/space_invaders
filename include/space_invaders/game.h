@@ -12,6 +12,7 @@ public:
 	Game();
 	void run();
 	void togglePause() { m_paused = !m_paused; }
+	void start() { m_started = true; }
 	void reset();
 private:
 	void initPlayer();
@@ -28,12 +29,14 @@ private:
 	void initBarriers(const int numBarriers = GAME_NUM_BARRIERS);
 	void setPlayerTargets();
 	void setAlienTargets();
+	void displayOptionalOverlay();
 
 	shared_ptr<Interface> m_interface;
 	shared_ptr<Player> m_player;
 	vector<shared_ptr<Entity>> m_entities;
 	vector<shared_ptr<Alien>> m_aliens;
 	vector<shared_ptr<Entity>> m_barriers;
+	bool m_started = false;
 	bool m_paused = false;
 	bool m_gameOver = false;
 
