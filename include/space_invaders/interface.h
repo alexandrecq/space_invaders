@@ -53,7 +53,7 @@ public:
 	bool isAlive() const;
 	void drawRectangle(Array2f bottomLeft, Array2f widthHeight,
 		    const Array4f& color = {1.f, 1.f, 1.f, 1.f}, bool onGameCanvas = false) const;
-	void setPlayer(std::shared_ptr<Player> player) { m_player = player; }
+	void setPlayer(std::shared_ptr<const Player> player) { m_player = player; }
 	void drawTexture(
 		const GLuint textureID,
 		const float& x, const float& y, const float& width, const float& height,
@@ -65,14 +65,13 @@ public:
 	) const;
 	void displayOverlay(OverlayType type) const;
 private:
-	// bool keyboardEvent() const;
 	void drawDashboard() const;
 	void drawBorder(const Array2f& bottomLeft, const Array2f& widthHeight, float thickness,
 		const Array4f& color = {1.f, 1.f, 1.f, 1.f}
 	) const;
 	inline void updateWindowSize() { glfwGetWindowSize(m_window, &m_windowWidthHeight.x(), &m_windowWidthHeight.y()); }
 
-	std::shared_ptr<Player> m_player;
+	std::shared_ptr<const Player> m_player;
 	GLFWwindow* m_window = nullptr;
 	Eigen::Array2i m_windowWidthHeight;
 	ImFont* m_fontBody;

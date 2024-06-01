@@ -166,7 +166,7 @@ void Alien::update(int ticks)  {
 }
 
 bool Alien::hasReachedBottom() const {
-    return aabb().intersects(gameOverAABB);
+    return (m_active && aabb().intersects(gameOverAABB));
 }
 
 

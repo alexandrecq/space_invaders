@@ -27,8 +27,8 @@ public:
 	void setActive(bool active) { m_active = active; }
 	bool isActive() const { return m_active; }
 	void setDrawMe(bool drawMe) { m_drawMe = drawMe; }
-	int getNumLives() { return m_numLives; }
-	Animation getDefaultAnimation() { return m_animations[ENTITY_DEFAULT_ANIMATION]; }
+	int getNumLives() const { return m_numLives; }
+	Animation getDefaultAnimation() const { return m_animations[ENTITY_DEFAULT_ANIMATION]; }
 protected:
 	void updateCurrentAnimation(int ticks);
 	virtual void reset();
@@ -85,7 +85,7 @@ public:
 	void update(int ticks) override;
 	void takeStep(bool toTheRight);
 	void reset() override;
-	long long const* getScore() { return m_projectile->getTotalHits(); }
+	long long const* getScore() const { return m_projectile->getTotalHits(); }
 };
 
 
