@@ -6,6 +6,13 @@
 #include "space_invaders/entity.h"
 
 
+enum class GameState {
+	Running,
+	Starting,
+	Pause,
+	GameOver
+};
+
 class Game {
 public:
 	Game();
@@ -26,20 +33,17 @@ private:
 	void initBarriers(const int numBarriers = GAME_NUM_BARRIERS);
 	void setPlayerTargets();
 	void setAlienTargets();
-	void handleKeyboardEvents(keyboardEvents& events);
+	void handleKeyboardEvents();
 	void checkGameOver();
-	bool isRunning () const { return (m_started && !m_gameOver && !m_paused); }
-	void togglePause() { m_paused = !m_paused; }
-	void displayOptionalOverlay() const;
+	bool isRunning () const { return m_state == GameState::Running; }
+	void togglePause();
 
 	Interface m_interface;
 	shared_ptr<Player> m_player;
 	vector<shared_ptr<Entity>> m_entities;
 	vector<shared_ptr<Alien>> m_aliens;
 	vector<shared_ptr<Entity>> m_barriers;
-	bool m_started = false;
-	bool m_paused = false;
-	bool m_gameOver = false;
+	GameState m_state = GameState::Starting;
 
 	std::chrono::time_point<std::chrono::steady_clock> m_startTime;
 	const int m_tickMS = GAME_TICK_MS;

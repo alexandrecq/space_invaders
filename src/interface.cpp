@@ -2,8 +2,9 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-#include "space_invaders/interface.h"
 #include "space_invaders/entity.h"
+#include "space_invaders/game.h"
+#include "space_invaders/interface.h"
 
 
 static const ImGuiWindowFlags dummyWindowFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus;
@@ -13,17 +14,17 @@ static void glfw_error_callback(int error, const char* description)
     fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }
 
-OverlayConfig getOverlayConfig(OverlayType type) {
+OverlayConfig getOverlayConfig(GameState type) {
     switch (type) {
-        case OverlayType::Starting:
+        case GameState::Starting:
             return {"starting", "SPACE INVADERS",
                     "A/D: MOVE LEFT/RIGHT\nW: FIRE\n[S]TART\n[P]AUSE\n[R]ESTART\n[Q]UIT"};
-        case OverlayType::Pause:
+        case GameState::Pause:
             return {"pause", "PAUSE", nullptr};
-        case OverlayType::GameOver:
+        case GameState::GameOver:
             return {"gameover", "GAME OVER!", "[R]ESTART?"};
         default:
-            return {"", "", nullptr};
+            return {nullptr, nullptr, nullptr};
     }
 }
 
@@ -234,12 +235,13 @@ void Interface::drawDashboard() const {
     }
 }
 
-void Interface::displayOverlay(OverlayType type) const {
+void Interface::displayOverlay(GameState state) const {
+    OverlayConfig config = getOverlayConfig(state);
+    if (!config.windowTitle) return;
+
     ImGui::SetNextWindowBgAlpha(INTERFACE_OVERLAY_ALPHA);
     ImGui::SetNextWindowPos(ImVec2(0, 0));
     ImGui::SetNextWindowSize(ImVec2(m_windowWidthHeight.x(), m_windowWidthHeight.y()));
-
-    OverlayConfig config = getOverlayConfig(type);
     ImGui::Begin(config.windowTitle, NULL, dummyWindowFlags);
     ImVec2 windowWidthHeight = ImGui::GetWindowSize();
 
@@ -250,4 +252,3 @@ void Interface::displayOverlay(OverlayType type) const {
 
     ImGui::End();
 }
-

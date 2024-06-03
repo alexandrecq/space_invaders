@@ -30,11 +30,7 @@ struct Canvas {
 	const Array2f m_widthHeight;
 };
 
-enum class OverlayType {
-    Starting,
-    Pause,
-    GameOver
-};
+enum class GameState;
 
 struct OverlayConfig {
     const char* windowTitle;
@@ -63,7 +59,7 @@ public:
 		const GLuint textureID,
 		Array2f bottomLeft, Array2f widthHeight, bool onGameCanvas = false
 	) const;
-	void displayOverlay(OverlayType type) const;
+	void displayOverlay(GameState type) const;
 private:
 	void drawDashboard() const;
 	void drawBorder(const Array2f& bottomLeft, const Array2f& widthHeight, float thickness,

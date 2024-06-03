@@ -14,8 +14,6 @@ Game::Game() {
 
 void Game::reset() {
     m_startTime = std::chrono::steady_clock::now();
-    m_paused = false;
-    m_gameOver = false;
 
     m_player = nullptr;
     m_entities.clear();
@@ -154,9 +152,7 @@ void Game::setAlienTargets() {
 void Game::run() {
     while (m_interface.isAlive()) {
         m_interface.startFrame();
-        keyboardEvents events;
-        m_interface.pollKeyboardEvents(events);
-        handleKeyboardEvents(events);
+        handleKeyboardEvents();
 
         std::this_thread::sleep_for(std::chrono::milliseconds(m_tickMS));
         auto elapsed = std::chrono::steady_clock::now() - m_startTime;
@@ -170,19 +166,24 @@ void Game::run() {
         }
 
         checkGameOver();
-        displayOptionalOverlay();
+        m_interface.displayOverlay(m_state);
         m_interface.renderFrame();
     }
 }
 
-void Game::handleKeyboardEvents(keyboardEvents& events) {
+void Game::handleKeyboardEvents() {
+    keyboardEvents events;
+    m_interface.pollKeyboardEvents(events);
+
     // game events
-    if (events.gameStart)
-        m_started = true;
+    if (events.gameStart && m_state == GameState::Starting)
+        m_state = GameState::Running;
     if (events.gamePause)
         togglePause();
-    if (events.gameRestart)
+    if (events.gameRestart) {
         reset();
+        m_state = GameState::Running;
+    }
     if (!isRunning()) return;
 
     // player events
@@ -196,32 +197,27 @@ void Game::handleKeyboardEvents(keyboardEvents& events) {
 
 void Game::checkGameOver() {
     if (m_player->getNumLives() <= 0) {
-        m_gameOver = true;
+        m_state = GameState::GameOver;
         return;
     }
 
     bool allAliensDead = true;
     for (auto& alien : m_aliens) {
         if (alien->hasReachedBottom()) {
-            m_gameOver = true;
+            m_state = GameState::GameOver;
             return;
         } else if (alien->isActive())
             allAliensDead = false;
     }
     if (allAliensDead) {
         reset();
-        m_started = false;
+        m_state = GameState::Starting;
     }
 }
 
-void Game::displayOptionalOverlay() const {
-    if (!m_started) {
-        m_interface.displayOverlay(OverlayType::Starting);
-    } else if (m_paused) {
-        m_interface.displayOverlay(OverlayType::Pause);
-    } else if (m_gameOver) {
-        m_interface.displayOverlay(OverlayType::GameOver);
-    }
+void Game::togglePause() {
+    if (m_state == GameState::Running) m_state = GameState::Pause;
+    else if (m_state == GameState::Pause) m_state = GameState::Running;
 }
 
 
