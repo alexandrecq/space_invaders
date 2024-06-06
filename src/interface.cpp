@@ -103,8 +103,14 @@ void Interface::startFrame() {
     glViewport(0, 0, display_w, display_h);
 
     glEnable(GL_BLEND);
-    glClearColor(INTERFACE_CLEAR_COLOR.x(), INTERFACE_CLEAR_COLOR.y(), INTERFACE_CLEAR_COLOR.z(), INTERFACE_CLEAR_COLOR.w());
+    const Array4f& cc = INTERFACE_CLEAR_COLOR;
+    const Array4f& bc = INTERFACE_BOTTOM_COLOR;
+    glClearColor(cc.x(), cc.y(), cc.z(), cc.w());
     glClear(GL_COLOR_BUFFER_BIT);
+
+    Eigen::Array<float, 4, 4> vertexColors;
+    vertexColors << bc, cc, cc, bc ;
+    drawRectangle(m_gameCanvas.m_bottomLeft, m_gameCanvas.m_widthHeight, vertexColors, false);
 
     updateWindowSize();
 }
@@ -118,17 +124,28 @@ void Interface::renderFrame() const {
 }
 
 void Interface::drawRectangle(
-    Array2f bottomLeft, Array2f widthHeight, const Array4f& color, bool onGameCanvas
+    Array2f bottomLeft, Array2f widthHeight, const Eigen::Array<float, 4, 4>& vertexColors, bool onGameCanvas
     ) const {
     if (onGameCanvas) m_gameCanvas.mapToGlobal(widthHeight, bottomLeft);
     glBegin(GL_QUADS);
-    glColor4f(color.x(), color.y(), color.z(), color.w());
+    glColor4f(vertexColors.col(0).x(), vertexColors.col(0).y(), vertexColors.col(0).z(), vertexColors.col(0).w());
     glVertex2f(bottomLeft.x(), bottomLeft.y());
+    glColor4f(vertexColors.col(1).x(), vertexColors.col(1).y(), vertexColors.col(1).z(), vertexColors.col(1).w());
     glVertex2f(bottomLeft.x(), bottomLeft.y() + widthHeight.y());
+    glColor4f(vertexColors.col(2).x(), vertexColors.col(2).y(), vertexColors.col(2).z(), vertexColors.col(2).w());
     glVertex2f(bottomLeft.x() + widthHeight.x(), bottomLeft.y() + widthHeight.y());
+    glColor4f(vertexColors.col(3).x(), vertexColors.col(3).y(), vertexColors.col(3).z(), vertexColors.col(3).w());
     glVertex2f(bottomLeft.x() + widthHeight.x(), bottomLeft.y());
     glColor4f(1.f, 1.f, 1.f, 1.f);  // reset color
     glEnd();
+}
+
+void Interface::drawRectangle(
+    Array2f bottomLeft, Array2f widthHeight, const Array4f& uniformColor, bool onGameCanvas
+    ) const {
+    Eigen::Array<float, 4, 4> vertexColors;
+    for (int i = 0; i < vertexColors.cols(); i++) vertexColors.col(i) = uniformColor;
+    drawRectangle(bottomLeft, widthHeight, vertexColors, onGameCanvas);
 }
 
 void Interface::drawTexture(

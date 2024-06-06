@@ -5,7 +5,6 @@
 #define GL_SILENCE_DEPRECATION
 #include <GLFW/glfw3.h> // Will drag system OpenGL headers
 
-#include "space_invaders/common.h"
 #include "space_invaders/constants.h"
 
 class Player;
@@ -47,6 +46,8 @@ public:
 	void startFrame();
 	void renderFrame() const;
 	bool isAlive() const;
+	void drawRectangle(Array2f bottomLeft, Array2f widthHeight,
+		    const Eigen::Array<float, 4, 4>& vertexColors, bool onGameCanvas) const;
 	void drawRectangle(Array2f bottomLeft, Array2f widthHeight,
 		    const Array4f& color = {1.f, 1.f, 1.f, 1.f}, bool onGameCanvas = false) const;
 	void setPlayer(std::shared_ptr<const Player> player) { m_player = player; }
